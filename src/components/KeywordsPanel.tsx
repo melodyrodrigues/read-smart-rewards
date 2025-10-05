@@ -47,26 +47,11 @@ const spaceWeatherKeywords = [
 ];
 
 export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
-  const [nasaData, setNasaData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [extractedKeywords, setExtractedKeywords] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchNasaData();
     extractKeywords();
   }, [books]);
-
-  const fetchNasaData = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke('nasa-space-weather');
-      if (error) throw error;
-      setNasaData(data);
-    } catch (error) {
-      console.error('Error fetching NASA data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const extractKeywords = () => {
     const keywords = new Set<string>();
@@ -109,42 +94,6 @@ export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
           Keywords detected in your library related to space weather. Click on any keyword for interactive definitions powered by NASA data.
         </p>
       </Card>
-
-      {/* NASA Data Summary */}
-      {nasaData && (
-        <Card className="p-6 glass-card border-accent/20">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-accent" />
-            Live NASA Space Weather Data
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">
-                {nasaData.solarFlares?.count || 0}
-              </div>
-              <div className="text-sm text-muted-foreground">Solar Flares</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">
-                {nasaData.coronalMassEjections?.count || 0}
-              </div>
-              <div className="text-sm text-muted-foreground">CME Events</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">
-                {nasaData.geomagneticStorms?.count || 0}
-              </div>
-              <div className="text-sm text-muted-foreground">Geomagnetic Storms</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">
-                {nasaData.notifications?.count || 0}
-              </div>
-              <div className="text-sm text-muted-foreground">Notifications</div>
-            </div>
-          </div>
-        </Card>
-      )}
 
       {/* Keywords Grid */}
       {extractedKeywords.length > 0 ? (
