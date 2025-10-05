@@ -25,6 +25,35 @@ export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  // Helper function to extract keywords locally when AI fails
+  const extractFallback = (text: string, limit = 12): KeywordWithInfo[] => {
+    if (!text) return [];
+    const cleaned = text
+      .toLowerCase()
+      .replace(/[^a-zà-ú0-9\s-]/gi, ' ')
+      .replace(/\s+/g, ' ');
+    const stop = new Set([
+      'the','and','of','to','a','in','is','it','that','as','for','on','with','this','by','an','be','or','from','at','are','was','were','um','uma','de','da','do','das','dos','e','o','a','os','as','que','por','com','para','em','se','no','na','nos','nas'
+    ]);
+    const counts: Record<string, number> = {};
+    for (const w of cleaned.split(' ')) {
+      if (!w || w.length < 4 || stop.has(w)) continue;
+      counts[w] = (counts[w] || 0) + 1;
+    }
+    return Object.entries(counts)
+      .sort((a,b) => b[1]-a[1])
+      .slice(0, limit)
+      .map(([w]) => ({
+        keyword: w,
+        definition: `Topic related to "${w}" found in your book content`,
+        category: 'General',
+        example: undefined,
+        relatedTerms: [],
+        hasNasaInfo: false,
+        nasaData: null
+      }));
+  };
+
   useEffect(() => {
     if (books.length > 0) {
       analyzeBooks();
@@ -34,37 +63,8 @@ export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
   const analyzeBooks = async () => {
     setLoading(true);
     try {
-      // Analyze all books
       const allKeywords: KeywordWithInfo[] = [];
       let usedFallback = false;
-
-      const extractFallback = (text: string, limit = 12): KeywordWithInfo[] => {
-        if (!text) return [];
-        const cleaned = text
-          .toLowerCase()
-          .replace(/[^a-zà-ú0-9\s-]/gi, ' ')
-          .replace(/\s+/g, ' ');
-        const stop = new Set([
-          'the','and','of','to','a','in','is','it','that','as','for','on','with','this','by','an','be','or','from','at','are','was','were','um','uma','de','da','do','das','dos','e','o','a','os','as','que','por','com','para','em','se','no','na','nos','nas'
-        ]);
-        const counts: Record<string, number> = {};
-        for (const w of cleaned.split(' ')) {
-          if (!w || w.length < 4 || stop.has(w)) continue;
-          counts[w] = (counts[w] || 0) + 1;
-        }
-        return Object.entries(counts)
-          .sort((a,b) => b[1]-a[1])
-          .slice(0, limit)
-          .map(([w]) => ({
-            keyword: w,
-            definition: `Topic related to "${w}" found in your book content`,
-            category: 'General',
-            example: undefined,
-            relatedTerms: [],
-            hasNasaInfo: false,
-            nasaData: null
-          }));
-      };
       
       for (const book of books) {
         const { data, error } = await supabase.functions.invoke('analyze-book-keywords', {
