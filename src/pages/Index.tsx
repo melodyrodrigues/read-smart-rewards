@@ -40,9 +40,20 @@ const Index = () => {
   };
 
   const loadData = async () => {
-    const { data: booksData } = await supabase.from("books").select("*");
+    const { data: booksData } = await supabase
+      .from("books")
+      .select(`
+        *,
+        reading_progress(current_page, pages_read)
+      `);
     const { data: achievementsData } = await supabase.from("user_achievements").select("*");
-    setBooks(booksData || []);
+    
+    const booksWithProgress = booksData?.map(book => ({
+      ...book,
+      progress: book.reading_progress?.[0] || null
+    }));
+    
+    setBooks(booksWithProgress || []);
     setAchievements(achievementsData || []);
   };
 
@@ -134,7 +145,8 @@ const Index = () => {
                     <BookCard
                       key={book.id}
                       book={book}
-                      onClick={() => {}}
+                      progress={book.progress}
+                      onClick={() => navigate(`/reader?id=${book.id}`)}
                       onDelete={handleDeleteBook}
                     />
                   ))}
