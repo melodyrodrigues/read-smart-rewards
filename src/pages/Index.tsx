@@ -9,6 +9,7 @@ import BookCard from "@/components/BookCard";
 import ChatAssistant from "@/components/ChatAssistant";
 import AchievementBadge from "@/components/AchievementBadge";
 import UploadBook from "@/components/UploadBook";
+import KeywordsPanel from "@/components/KeywordsPanel";
 import heroImage from "@/assets/hero-reading.jpg";
 
 const Index = () => {
@@ -121,10 +122,14 @@ const Index = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="library" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="library" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
               Library
+            </TabsTrigger>
+            <TabsTrigger value="keywords" className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              Keywords
             </TabsTrigger>
             <TabsTrigger value="assistant" className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
@@ -160,6 +165,10 @@ const Index = () => {
                 <p>No books added yet. Start by uploading one above!</p>
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="keywords">
+            <KeywordsPanel books={books} />
           </TabsContent>
 
           <TabsContent value="assistant">
