@@ -34,44 +34,25 @@ export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
   const analyzeBooks = async () => {
     setLoading(true);
     try {
-      // Analyze books one at a time with delays to avoid rate limiting
+      // Analyze all books
       const allKeywords: KeywordWithInfo[] = [];
       
-      for (let i = 0; i < books.length; i++) {
-        const book = books[i];
-        console.log(`Analyzing book ${i + 1}/${books.length}: ${book.title}`);
-        
-        try {
-          const { data, error } = await supabase.functions.invoke('analyze-book-keywords', {
-            body: {
-              bookTitle: book.title,
-              bookAuthor: book.author,
-              bookContent: book.content
-            }
-          });
+      for (const book of books) {
+        const { data, error } = await supabase.functions.invoke('analyze-book-keywords', {
+          body: {
+            bookTitle: book.title,
+            bookAuthor: book.author,
+            bookContent: book.content
+          }
+        });
 
-          if (error) {
-            console.error('Error analyzing book:', error);
-            toast({
-              title: `Error analyzing "${book.title}"`,
-              description: "Skipping to next book...",
-              variant: "destructive"
-            });
-            continue;
-          }
-
-          if (data?.success && data?.keywords) {
-            allKeywords.push(...data.keywords);
-            console.log(`Added ${data.keywords.length} keywords from "${book.title}"`);
-          }
-          
-          // Add delay between books to avoid rate limiting (2 seconds)
-          if (i < books.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 2000));
-          }
-        } catch (bookError) {
-          console.error(`Error processing book "${book.title}":`, bookError);
+        if (error) {
+          console.error('Error analyzing book:', error);
           continue;
+        }
+
+        if (data?.success && data?.keywords) {
+          allKeywords.push(...data.keywords);
         }
       }
 

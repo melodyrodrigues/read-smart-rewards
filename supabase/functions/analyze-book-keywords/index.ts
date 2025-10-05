@@ -6,34 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Helper function for exponential backoff retry
-async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 3): Promise<Response> {
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      const response = await fetch(url, options);
-      
-      // If rate limited, wait and retry
-      if (response.status === 429) {
-        const waitTime = Math.pow(2, attempt) * 1000; // Exponential backoff: 1s, 2s, 4s
-        console.log(`Rate limited, waiting ${waitTime}ms before retry ${attempt + 1}/${maxRetries}`);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
-        continue;
-      }
-      
-      return response;
-    } catch (error) {
-      if (attempt === maxRetries - 1) throw error;
-      const waitTime = Math.pow(2, attempt) * 1000;
-      console.log(`Request failed, waiting ${waitTime}ms before retry ${attempt + 1}/${maxRetries}`);
-      await new Promise(resolve => setTimeout(resolve, waitTime));
-    }
-  }
-  throw new Error("Max retries exceeded");
-}
-
-// Helper to add delay between requests
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -55,8 +27,8 @@ serve(async (req) => {
 
     console.log(`Analyzing keywords for book: ${bookTitle}`);
 
-    // Use Lovable AI to extract keywords with retry
-    const aiResponse = await fetchWithRetry("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // Use Lovable AI to extract keywords
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
@@ -120,22 +92,14 @@ serve(async (req) => {
 
     console.log(`Extracted ${keywords.length} keywords:`, keywords);
 
-    // Process keywords sequentially with delays to avoid rate limiting
-    const keywordsWithInfo = [];
-    const selectedKeywords = keywords.slice(0, 10); // Limit to 10 keywords per book
-    
-    for (let i = 0; i < selectedKeywords.length; i++) {
-      const keyword = selectedKeywords[i];
-      try {
-        console.log(`Generating info for keyword ${i + 1}/${selectedKeywords.length}: ${keyword}`);
-        
-        // Add delay between requests to avoid rate limiting (500ms)
-        if (i > 0) {
-          await delay(500);
-        }
-        
-        // Use AI to generate detailed definition and related info with retry
-        const infoResponse = await fetchWithRetry("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // For each keyword, generate comprehensive information using AI
+    const keywordsWithInfo = await Promise.all(
+      keywords.slice(0, 15).map(async (keyword) => {
+        try {
+          console.log(`Generating info for keyword: ${keyword}`);
+          
+          // Use AI to generate detailed definition and related info
+          const infoResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
             headers: {
               Authorization: `Bearer ${LOVABLE_API_KEY}`,
@@ -204,7 +168,7 @@ serve(async (req) => {
           console.log(`No NASA data for ${keyword}`);
         }
 
-        keywordsWithInfo.push({
+        return {
           keyword,
           definition: termInfo?.definition || `Scientific term related to ${keyword}`,
           category: termInfo?.category || "Science",
@@ -212,10 +176,10 @@ serve(async (req) => {
           relatedTerms: termInfo?.relatedTerms || [],
           hasNasaInfo: !!nasaData,
           nasaData: nasaData
-        });
+        };
       } catch (error) {
         console.error(`Error generating info for keyword "${keyword}":`, error);
-        keywordsWithInfo.push({
+        return {
           keyword,
           definition: `Scientific term: ${keyword}`,
           category: "General",
@@ -223,9 +187,10 @@ serve(async (req) => {
           relatedTerms: [],
           hasNasaInfo: false,
           nasaData: null
-        });
+        };
       }
-    }
+    })
+  );
 
     console.log(`Successfully analyzed book with ${keywordsWithInfo.length} keywords`);
 
