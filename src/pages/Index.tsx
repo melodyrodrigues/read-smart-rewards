@@ -16,6 +16,7 @@ const Index = () => {
   const [user, setUser] = useState<any>(null);
   const [books, setBooks] = useState<any[]>([]);
   const [achievements, setAchievements] = useState<any[]>([]);
+  const [userStats, setUserStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -41,6 +42,8 @@ const Index = () => {
   };
 
   const loadData = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
     const { data: booksData } = await supabase
       .from("books")
       .select(`
@@ -48,6 +51,16 @@ const Index = () => {
         reading_progress(current_page, pages_read)
       `);
     const { data: achievementsData } = await supabase.from("user_achievements").select("*");
+    
+    // Load user stats
+    if (user) {
+      const { data: statsData } = await supabase
+        .from("user_stats")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+      setUserStats(statsData || { keyword_clicks: 0, audio_plays: 0 });
+    }
     
     const booksWithProgress = booksData?.map(book => ({
       ...book,
@@ -178,11 +191,27 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="achievements">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-6xl mx-auto">
               <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-primary bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(168,85,247,0.4)]">
                 🌟 Stellar Achievements
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              {/* Stats Display */}
+              {userStats && (
+                <div className="mb-8 grid grid-cols-2 gap-4 max-w-md mx-auto">
+                  <div className="glass-card p-4 text-center">
+                    <div className="text-3xl font-bold text-primary">{userStats.keyword_clicks || 0}</div>
+                    <div className="text-sm text-muted-foreground">Keywords Explored</div>
+                  </div>
+                  <div className="glass-card p-4 text-center">
+                    <div className="text-3xl font-bold text-accent">{userStats.audio_plays || 0}</div>
+                    <div className="text-sm text-muted-foreground">Audio Lessons</div>
+                  </div>
+                </div>
+              )}
+
+              <h3 className="text-xl font-semibold mb-4 text-center">Library Missions</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <AchievementBadge
                   type="reader"
                   earned={books.length >= 1}
@@ -197,6 +226,44 @@ const Index = () => {
                   type="master"
                   earned={books.length >= 10}
                   description="Add 10 books to the library"
+                />
+              </div>
+
+              <h3 className="text-xl font-semibold mb-4 text-center">Exploration Missions</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <AchievementBadge
+                  type="reader"
+                  earned={(userStats?.keyword_clicks || 0) >= 10}
+                  description="Explore 10 keywords"
+                />
+                <AchievementBadge
+                  type="scholar"
+                  earned={(userStats?.keyword_clicks || 0) >= 50}
+                  description="Explore 50 keywords"
+                />
+                <AchievementBadge
+                  type="master"
+                  earned={(userStats?.keyword_clicks || 0) >= 100}
+                  description="Explore 100 keywords"
+                />
+              </div>
+
+              <h3 className="text-xl font-semibold mb-4 mt-8 text-center">Audio Learning Missions</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <AchievementBadge
+                  type="reader"
+                  earned={(userStats?.audio_plays || 0) >= 5}
+                  description="Listen to 5 audio lessons"
+                />
+                <AchievementBadge
+                  type="scholar"
+                  earned={(userStats?.audio_plays || 0) >= 25}
+                  description="Listen to 25 audio lessons"
+                />
+                <AchievementBadge
+                  type="master"
+                  earned={(userStats?.audio_plays || 0) >= 50}
+                  description="Listen to 50 audio lessons"
                 />
               </div>
             </div>
