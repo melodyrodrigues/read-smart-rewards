@@ -133,11 +133,64 @@ export const GlossaryPopover = ({ term, children, definition, category, example 
     return <>{children}</>;
   }
 
+  const updateKeywordClick = async (keyword: string) => {
+    const lowerKeyword = keyword.toLowerCase();
+    
+    // Determine which telescope category this keyword belongs to
+    let telescopeType: 'hubble_clicks' | 'chandra_clicks' | 'jwst_clicks' | null = null;
+    
+    if (lowerKeyword.includes('hubble')) {
+      telescopeType = 'hubble_clicks';
+    } else if (lowerKeyword.includes('chandra')) {
+      telescopeType = 'chandra_clicks';
+    } else if (lowerKeyword.includes('webb') || lowerKeyword.includes('jwst') || lowerKeyword.includes('james webb')) {
+      telescopeType = 'jwst_clicks';
+    }
+    
+    if (!telescopeType) return;
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      // Get or create user stats
+      const { data: existingStats } = await supabase
+        .from('user_stats')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (existingStats) {
+        // Update existing stats
+        await supabase
+          .from('user_stats')
+          .update({
+            [telescopeType]: (existingStats[telescopeType] || 0) + 1,
+            keyword_clicks: (existingStats.keyword_clicks || 0) + 1
+          })
+          .eq('user_id', user.id);
+      } else {
+        // Create new stats record
+        await supabase
+          .from('user_stats')
+          .insert({
+            user_id: user.id,
+            [telescopeType]: 1,
+            keyword_clicks: 1
+          });
+      }
+    } catch (error) {
+      console.error('Error updating keyword click stats:', error);
+    }
+  };
+
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (open) {
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 600);
+      // Track keyword click when opening
+      updateKeywordClick(term);
     } else {
       // Stop audio when closing
       if (audioRef.current) {

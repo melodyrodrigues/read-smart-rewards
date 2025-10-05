@@ -16,6 +16,7 @@ const Index = () => {
   const [user, setUser] = useState<any>(null);
   const [books, setBooks] = useState<any[]>([]);
   const [achievements, setAchievements] = useState<any[]>([]);
+  const [userStats, setUserStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -41,6 +42,8 @@ const Index = () => {
   };
 
   const loadData = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
     const { data: booksData } = await supabase
       .from("books")
       .select(`
@@ -48,6 +51,16 @@ const Index = () => {
         reading_progress(current_page, pages_read)
       `);
     const { data: achievementsData } = await supabase.from("user_achievements").select("*");
+    
+    // Load user stats for telescope badges
+    if (user) {
+      const { data: statsData } = await supabase
+        .from("user_stats")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+      setUserStats(statsData);
+    }
     
     const booksWithProgress = booksData?.map(book => ({
       ...book,
@@ -178,26 +191,58 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="achievements">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-primary bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(168,85,247,0.4)]">
-                🌟 Stellar Achievements
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <AchievementBadge
-                  type="reader"
-                  earned={books.length >= 1}
-                  description="Add your first book"
-                />
-                <AchievementBadge
-                  type="scholar"
-                  earned={books.length >= 5}
-                  description="Add 5 books to the library"
-                />
-                <AchievementBadge
-                  type="master"
-                  earned={books.length >= 10}
-                  description="Add 10 books to the library"
-                />
+            <div className="max-w-6xl mx-auto space-y-8">
+              <div>
+                <h2 className="text-3xl font-bold mb-2 text-center bg-gradient-primary bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+                  🌟 Stellar Achievements
+                </h2>
+                <p className="text-center text-muted-foreground mb-8">
+                  Complete missions and explore telescope keywords
+                </p>
+              </div>
+
+              {/* Mission Badges */}
+              <div>
+                <h3 className="text-xl font-semibold mb-4 text-center">Mission Badges</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <AchievementBadge
+                    type="reader"
+                    earned={books.length >= 1}
+                    description="Add your first book"
+                  />
+                  <AchievementBadge
+                    type="scholar"
+                    earned={books.length >= 5}
+                    description="Add 5 books to the library"
+                  />
+                  <AchievementBadge
+                    type="master"
+                    earned={books.length >= 10}
+                    description="Add 10 books to the library"
+                  />
+                </div>
+              </div>
+
+              {/* Telescope Explorer Badges */}
+              <div>
+                <h3 className="text-xl font-semibold mb-4 text-center">Telescope Explorer Badges</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <AchievementBadge
+                    type="hubble"
+                    earned={(userStats?.hubble_clicks || 0) >= 5}
+                    description="Click 5 Hubble-related keywords"
+                  />
+                  <AchievementBadge
+                    type="chandra"
+                    earned={(userStats?.chandra_clicks || 0) >= 5}
+                    description="Click 5 Chandra-related keywords"
+                  />
+                  <AchievementBadge
+                    type="jwst"
+                    earned={(userStats?.jwst_clicks || 0) >= 5}
+                    description="Click 5 James Webb-related keywords"
+                  />
+                </div>
               </div>
             </div>
           </TabsContent>

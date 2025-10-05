@@ -2,9 +2,12 @@ import { Card } from "@/components/ui/card";
 import badgeReader from "@/assets/badge-reader.png";
 import badgeScholar from "@/assets/badge-scholar.png";
 import badgeMaster from "@/assets/badge-master.png";
+import badgeHubble from "@/assets/badge-hubble.png";
+import badgeChandra from "@/assets/badge-chandra.png";
+import badgeJWST from "@/assets/badge-jwst.png";
 
 interface AchievementBadgeProps {
-  type: "reader" | "scholar" | "master";
+  type: "reader" | "scholar" | "master" | "hubble" | "chandra" | "jwst";
   earned?: boolean;
   description: string;
 }
@@ -27,6 +30,24 @@ const BADGE_MAP = {
     title: "MISSION APOLLO 3", 
     gradient: "bg-gradient-to-br from-purple-500 via-violet-500 to-fuchsia-500",
     glow: "shadow-[0_0_40px_hsl(280_85%_60%/0.6)]"
+  },
+  hubble: { 
+    img: badgeHubble, 
+    title: "HUBBLE EXPLORER", 
+    gradient: "bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600",
+    glow: "shadow-[0_0_35px_hsl(45_100%_50%/0.6)]"
+  },
+  chandra: { 
+    img: badgeChandra, 
+    title: "CHANDRA OBSERVER", 
+    gradient: "bg-gradient-to-br from-blue-400 via-cyan-500 to-blue-600",
+    glow: "shadow-[0_0_35px_hsl(195_85%_55%/0.6)]"
+  },
+  jwst: { 
+    img: badgeJWST, 
+    title: "JAMES WEBB PIONEER", 
+    gradient: "bg-gradient-to-br from-yellow-500 via-amber-600 to-orange-500",
+    glow: "shadow-[0_0_40px_hsl(35_95%_55%/0.7)]"
   },
 };
 

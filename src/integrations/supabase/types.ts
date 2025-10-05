@@ -115,24 +115,33 @@ export type Database = {
       user_stats: {
         Row: {
           audio_plays: number | null
+          chandra_clicks: number | null
           created_at: string
+          hubble_clicks: number | null
           id: string
+          jwst_clicks: number | null
           keyword_clicks: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           audio_plays?: number | null
+          chandra_clicks?: number | null
           created_at?: string
+          hubble_clicks?: number | null
           id?: string
+          jwst_clicks?: number | null
           keyword_clicks?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           audio_plays?: number | null
+          chandra_clicks?: number | null
           created_at?: string
+          hubble_clicks?: number | null
           id?: string
+          jwst_clicks?: number | null
           keyword_clicks?: number | null
           updated_at?: string
           user_id?: string
