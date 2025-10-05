@@ -110,7 +110,7 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />
         <div className="absolute inset-0 flex flex-col items-start justify-center px-8 md:px-16 max-w-2xl">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent animate-fade-in drop-shadow-[0_0_20px_rgba(168,85,247,0.3)]">
-            Cosmo Reader
+            Cosmos Reader
           </h1>
           <div className="flex gap-3">
             <Button 
