@@ -12,6 +12,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -31,7 +32,17 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      if (isLogin) {
+      if (isForgotPassword) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/auth`,
+        });
+        if (error) throw error;
+        toast({ 
+          title: "Password reset email sent!", 
+          description: "Check your email for the reset link." 
+        });
+        setIsForgotPassword(false);
+      } else if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast({ title: "Successfully signed in!" });
@@ -74,7 +85,11 @@ const Auth = () => {
           Cosmo Reader
         </h1>
         <p className="text-center text-muted-foreground mb-8">
-          {isLogin ? "Sign in to your account" : "Create your account"}
+          {isForgotPassword 
+            ? "Reset your password" 
+            : isLogin 
+            ? "Sign in to your account" 
+            : "Create your account"}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -90,35 +105,66 @@ const Auth = () => {
             />
           </div>
 
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              className="mt-1"
-            />
-          </div>
+          {!isForgotPassword && (
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <Label htmlFor="password">Password</Label>
+                {isLogin && (
+                  <button
+                    type="button"
+                    onClick={() => setIsForgotPassword(true)}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                )}
+              </div>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                className="mt-1"
+              />
+            </div>
+          )}
 
           <Button
             type="submit"
             className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
             disabled={loading}
           >
-            {loading ? "Loading..." : isLogin ? "Sign In" : "Create Account"}
+            {loading 
+              ? "Loading..." 
+              : isForgotPassword 
+              ? "Send Reset Link" 
+              : isLogin 
+              ? "Sign In" 
+              : "Create Account"}
           </Button>
         </form>
 
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-sm text-primary hover:underline"
-          >
-            {isLogin ? "Don't have an account? Create one" : "Already have an account? Sign in"}
-          </button>
+        <div className="mt-6 text-center space-y-2">
+          {isForgotPassword ? (
+            <button
+              onClick={() => {
+                setIsForgotPassword(false);
+                setIsLogin(true);
+              }}
+              className="text-sm text-primary hover:underline"
+            >
+              Back to sign in
+            </button>
+          ) : (
+            <button
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-sm text-primary hover:underline"
+            >
+              {isLogin ? "Don't have an account? Create one" : "Already have an account? Sign in"}
+            </button>
+          )}
         </div>
       </Card>
     </div>
