@@ -1,0 +1,4 @@
+project_id = "hywjlflrlkwgysjayozl"
+
+[functions.book-assistant]
+verify_jwt = true
