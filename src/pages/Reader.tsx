@@ -2,15 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Input } from "@/components/ui/input";
-import { ArrowLeft, ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
+import { ArrowLeft, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ChatAssistant from "@/components/ChatAssistant";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { GlossaryIndicator } from "@/components/GlossaryIndicator";
 import { GlossaryPanel } from "@/components/GlossaryPanel";
+import { PDFViewer } from "@/components/PDFViewer";
 
 const Reader = () => {
   const [searchParams] = useSearchParams();
@@ -22,7 +21,6 @@ const Reader = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pagesRead, setPagesRead] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [pageInput, setPageInput] = useState("1");
   const [viewUrl, setViewUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -75,7 +73,6 @@ const Reader = () => {
       if (progressData) {
         setCurrentPage(progressData.current_page || 1);
         setPagesRead(progressData.pages_read || 0);
-        setPageInput(String(progressData.current_page || 1));
       }
 
       // Generate a signed URL for private buckets or fallback to stored URL
@@ -163,18 +160,9 @@ const Reader = () => {
   };
 
   const handlePageChange = (newPage: number) => {
-    if (newPage < 1 || newPage > book.total_pages) return;
+    if (!book || newPage < 1 || newPage > book.total_pages) return;
     setCurrentPage(newPage);
-    setPageInput(String(newPage));
     updateProgress(newPage);
-  };
-
-  const handlePageInputChange = (e: React.FormEvent) => {
-    e.preventDefault();
-    const page = parseInt(pageInput);
-    if (!isNaN(page)) {
-      handlePageChange(page);
-    }
   };
 
   if (loading) {
@@ -246,53 +234,18 @@ const Reader = () => {
 
       {/* PDF Viewer */}
       <div className="container mx-auto px-4 py-6">
-        <Card className="glass-card overflow-hidden">
-          <div className="aspect-[3/4] bg-secondary/20">
-            <iframe
-              src={`${(viewUrl || book.file_url)}#page=${currentPage}`}
-              className="w-full h-full"
-              title={book.title}
-            />
+        {viewUrl ? (
+          <PDFViewer
+            fileUrl={viewUrl}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+            bookTitle={book.title}
+          />
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Unable to load PDF file</p>
           </div>
-
-          {/* Controls */}
-          <div className="p-4 border-t glass-card flex items-center justify-between gap-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage <= 1}
-              className="hover:bg-primary hover:text-primary-foreground transition-all"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-
-            <form onSubmit={handlePageInputChange} className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Page</span>
-              <Input
-                type="number"
-                value={pageInput}
-                onChange={(e) => setPageInput(e.target.value)}
-                className="w-20 text-center glass-card"
-                min={1}
-                max={book.total_pages}
-              />
-              <span className="text-sm text-muted-foreground">
-                of {book.total_pages}
-              </span>
-            </form>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage >= book.total_pages}
-              className="hover:bg-primary hover:text-primary-foreground transition-all"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </Card>
+        )}
       </div>
     </div>
   );
