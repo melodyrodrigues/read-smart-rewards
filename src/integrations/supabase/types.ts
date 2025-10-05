@@ -112,6 +112,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_stats: {
+        Row: {
+          audio_plays: number | null
+          created_at: string
+          id: string
+          keyword_clicks: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audio_plays?: number | null
+          created_at?: string
+          id?: string
+          keyword_clicks?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audio_plays?: number | null
+          created_at?: string
+          id?: string
+          keyword_clicks?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
