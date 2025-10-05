@@ -18,6 +18,9 @@ interface GlossaryTerm {
 interface GlossaryPopoverProps {
   term: string;
   children: React.ReactNode;
+  definition?: string;
+  category?: string;
+  example?: string;
 }
 
 // Predefined glossary with space-related terms
@@ -108,7 +111,7 @@ const glossaryTerms: Record<string, GlossaryTerm> = {
   }
 };
 
-export const GlossaryPopover = ({ term, children }: GlossaryPopoverProps) => {
+export const GlossaryPopover = ({ term, children, definition, category, example }: GlossaryPopoverProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
@@ -116,7 +119,15 @@ export const GlossaryPopover = ({ term, children }: GlossaryPopoverProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const termKey = term.toLowerCase().replace(/[^a-z]/g, '');
-  const glossaryEntry = glossaryTerms[termKey];
+  const predefinedEntry = glossaryTerms[termKey];
+  
+  // Use provided definition or fallback to predefined glossary
+  const glossaryEntry = definition ? {
+    term,
+    definition,
+    category: category || "General",
+    videoUrl: predefinedEntry?.videoUrl
+  } : predefinedEntry;
 
   if (!glossaryEntry) {
     return <>{children}</>;
@@ -268,6 +279,13 @@ export const GlossaryPopover = ({ term, children }: GlossaryPopoverProps) => {
             <p className="text-sm leading-relaxed text-foreground/90">
               {glossaryEntry.definition}
             </p>
+            
+            {example && (
+              <div className="mt-2 p-2 bg-accent/10 rounded-md border-l-2 border-accent">
+                <p className="text-xs font-semibold text-accent mb-1">Example:</p>
+                <p className="text-xs text-foreground/80">{example}</p>
+              </div>
+            )}
           </div>
           
           {/* Bottom gradient accent */}

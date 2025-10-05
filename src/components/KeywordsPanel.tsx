@@ -12,6 +12,10 @@ interface KeywordsPanelProps {
 
 interface KeywordWithInfo {
   keyword: string;
+  definition: string;
+  category: string;
+  example?: string;
+  relatedTerms?: string[];
   hasNasaInfo: boolean;
   nasaData: any;
 }
@@ -120,7 +124,13 @@ export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
           </h3>
           <div className="flex flex-wrap gap-3">
             {extractedKeywords.map((kwInfo, idx) => (
-              <GlossaryPopover key={`${kwInfo.keyword}-${idx}`} term={kwInfo.keyword}>
+              <GlossaryPopover 
+                key={`${kwInfo.keyword}-${idx}`} 
+                term={kwInfo.keyword}
+                definition={kwInfo.definition}
+                category={kwInfo.category}
+                example={kwInfo.example}
+              >
                 <Badge 
                   variant="secondary" 
                   className={`cursor-pointer hover:bg-primary/20 transition-colors text-base py-2 px-4 border ${
