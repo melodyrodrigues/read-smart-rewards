@@ -40,9 +40,8 @@ const UploadBook = ({ onUploadComplete }: UploadBookProps) => {
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from("books")
-        .getPublicUrl(filePath);
+      // Storage key relative to bucket (used to generate signed URLs)
+      const fileKey = filePath;
 
       // Create book record
       const { data: inserted, error: insertError } = await supabase
@@ -50,7 +49,7 @@ const UploadBook = ({ onUploadComplete }: UploadBookProps) => {
         .insert({
           title,
           author: author || null,
-          file_url: publicUrl,
+          file_url: fileKey,
           total_pages: parseInt(totalPages) || 0,
           user_id: user.id,
         })

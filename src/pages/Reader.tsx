@@ -79,8 +79,18 @@ const Reader = () => {
       }
 
       // Generate a signed URL for private buckets or fallback to stored URL
-      let urlForView: string | null = bookData.file_url || null;
-      const storagePath = bookData.file_url ? extractStoragePath(bookData.file_url) : null;
+      let urlForView: string | null = null;
+      let storagePath: string | null = null;
+
+      if (bookData.file_url) {
+        if (bookData.file_url.startsWith("http")) {
+          storagePath = extractStoragePath(bookData.file_url);
+        } else {
+          // We stored the storage key directly (e.g. userId/filename.pdf)
+          storagePath = bookData.file_url;
+        }
+      }
+
       if (storagePath) {
         const { data: signed, error: signErr } = await supabase
           .storage
@@ -90,6 +100,12 @@ const Reader = () => {
           urlForView = signed.signedUrl;
         }
       }
+
+      // Fallback to raw URL if signing was not possible (e.g., bucket public)
+      if (!urlForView && typeof bookData.file_url === "string") {
+        urlForView = bookData.file_url;
+      }
+
       setViewUrl(urlForView);
 
     } catch (error: any) {
