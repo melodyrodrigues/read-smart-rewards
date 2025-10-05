@@ -220,27 +220,21 @@ const Index = () => {
               </h2>
               
               {/* Stats Display */}
-              <div className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-                <div className="glass-card p-6 text-center hover:scale-105 transition-transform">
-                  <div className="text-4xl font-bold bg-gradient-to-br from-yellow-400 via-orange-400 to-orange-500 bg-clip-text text-transparent mb-2">{books.length}</div>
-                  <div className="text-sm text-muted-foreground font-medium">Books in Library</div>
+              {userStats && (
+                <div className="mb-8 grid grid-cols-2 gap-4 max-w-md mx-auto">
+                  <div className="glass-card p-4 text-center">
+                    <div className="text-3xl font-bold text-primary">{userStats.keyword_clicks || 0}</div>
+                    <div className="text-sm text-muted-foreground">Keywords Explored</div>
+                  </div>
+                  <div className="glass-card p-4 text-center">
+                    <div className="text-3xl font-bold text-accent">{userStats.audio_plays || 0}</div>
+                    <div className="text-sm text-muted-foreground">Audio Lessons</div>
+                  </div>
                 </div>
-                {userStats && (
-                  <>
-                    <div className="glass-card p-6 text-center hover:scale-105 transition-transform">
-                      <div className="text-4xl font-bold text-primary mb-2">{userStats.keyword_clicks || 0}</div>
-                      <div className="text-sm text-muted-foreground font-medium">Keywords Explored</div>
-                    </div>
-                    <div className="glass-card p-6 text-center hover:scale-105 transition-transform">
-                      <div className="text-4xl font-bold text-accent mb-2">{userStats.audio_plays || 0}</div>
-                      <div className="text-sm text-muted-foreground font-medium">Audio Lessons</div>
-                    </div>
-                  </>
-                )}
-              </div>
+              )}
 
               <h3 className="text-xl font-semibold mb-4 text-center">Library Missions</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <AchievementBadge
                   type="reader"
                   earned={books.length >= 1}
@@ -259,7 +253,7 @@ const Index = () => {
               </div>
 
               <h3 className="text-xl font-semibold mb-4 text-center">Exploration Missions</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <AchievementBadge
                   type="reader"
                   earned={(userStats?.keyword_clicks || 0) >= 10}
@@ -277,7 +271,7 @@ const Index = () => {
                 />
               </div>
 
-              <h3 className="text-xl font-semibold mb-4 text-center">Audio Learning Missions</h3>
+              <h3 className="text-xl font-semibold mb-4 mt-8 text-center">Audio Learning Missions</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <AchievementBadge
                   type="reader"

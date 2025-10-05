@@ -155,42 +155,42 @@ serve(async (req) => {
             }
           }
 
-        // Try to find NASA data or related content
-        let nasaData = null;
-        try {
-          const nasaSearchUrl = `https://api.nasa.gov/planetary/apod?api_key=${NASA_API_KEY}&count=1`;
-          const nasaResponse = await fetch(nasaSearchUrl);
-          if (nasaResponse.ok) {
-            const data = await nasaResponse.json();
-            nasaData = data[0];
+          // Try to find NASA data or related content
+          let nasaData = null;
+          try {
+            const nasaSearchUrl = `https://api.nasa.gov/planetary/apod?api_key=${NASA_API_KEY}&count=1`;
+            const nasaResponse = await fetch(nasaSearchUrl);
+            if (nasaResponse.ok) {
+              const data = await nasaResponse.json();
+              nasaData = data[0];
+            }
+          } catch (e) {
+            console.log(`No NASA data for ${keyword}`);
           }
-        } catch (e) {
-          console.log(`No NASA data for ${keyword}`);
-        }
 
-        return {
-          keyword,
-          definition: termInfo?.definition || `Scientific term related to ${keyword}`,
-          category: termInfo?.category || "Science",
-          example: termInfo?.example || null,
-          relatedTerms: termInfo?.relatedTerms || [],
-          hasNasaInfo: !!nasaData,
-          nasaData: nasaData
-        };
-      } catch (error) {
-        console.error(`Error generating info for keyword "${keyword}":`, error);
-        return {
-          keyword,
-          definition: `Scientific term: ${keyword}`,
-          category: "General",
-          example: null,
-          relatedTerms: [],
-          hasNasaInfo: false,
-          nasaData: null
-        };
-      }
-    })
-  );
+          return {
+            keyword,
+            definition: termInfo?.definition || `Scientific term related to ${keyword}`,
+            category: termInfo?.category || "Science",
+            example: termInfo?.example || null,
+            relatedTerms: termInfo?.relatedTerms || [],
+            hasNasaInfo: !!nasaData,
+            nasaData: nasaData
+          };
+        } catch (error) {
+          console.error(`Error generating info for keyword "${keyword}":`, error);
+          return {
+            keyword,
+            definition: `Scientific term: ${keyword}`,
+            category: "General",
+            example: null,
+            relatedTerms: [],
+            hasNasaInfo: false,
+            nasaData: null
+          };
+        }
+      })
+    );
 
     console.log(`Successfully analyzed book with ${keywordsWithInfo.length} keywords`);
 
