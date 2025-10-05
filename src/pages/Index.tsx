@@ -10,6 +10,7 @@ import ChatAssistant from "@/components/ChatAssistant";
 import AchievementBadge from "@/components/AchievementBadge";
 import UploadBook from "@/components/UploadBook";
 import KeywordsPanel from "@/components/KeywordsPanel";
+import Leaderboard from "@/components/Leaderboard";
 import heroImage from "@/assets/hero-reading.jpg";
 
 const Index = () => {
@@ -243,6 +244,12 @@ const Index = () => {
                     description="Click 50 keywords"
                   />
                 </div>
+              </div>
+
+              {/* Global Leaderboard */}
+              <div>
+                <h3 className="text-xl font-semibold mb-4 text-center">Global Rankings</h3>
+                <Leaderboard />
               </div>
             </div>
           </TabsContent>
