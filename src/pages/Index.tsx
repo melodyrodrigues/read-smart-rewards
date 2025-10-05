@@ -198,7 +198,7 @@ const Index = () => {
                   🌟 Stellar Achievements
                 </h2>
                 <p className="text-center text-muted-foreground mb-8">
-                  Complete missions and explore telescope keywords
+                  Complete missions and explore keywords
                 </p>
               </div>
 
