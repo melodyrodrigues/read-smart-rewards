@@ -13,10 +13,6 @@ export default {
       },
     },
     extend: {
-      fontFamily: {
-        'orbitron': ['Orbitron', 'Inter', 'sans-serif'],
-        'inter': ['Inter', 'sans-serif'],
-      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -93,16 +89,6 @@ export default {
           "0%, 100%": { boxShadow: "0 0 20px hsl(var(--primary) / 0.3)" },
           "50%": { boxShadow: "0 0 40px hsl(var(--primary) / 0.6)" },
         },
-        "solar-pulse": {
-          "0%, 100%": { 
-            boxShadow: "0 0 60px hsl(51 100% 50% / 0.6), 0 0 100px hsl(8 97% 56% / 0.4)",
-            transform: "scale(1)"
-          },
-          "50%": { 
-            boxShadow: "0 0 30px hsl(51 100% 50% / 0.4), 0 0 60px hsl(8 97% 56% / 0.3)",
-            transform: "scale(1.02)"
-          },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -110,7 +96,6 @@ export default {
         "fade-in": "fade-in 0.4s ease-out",
         "scale-in": "scale-in 0.3s ease-out",
         "glow-pulse": "glow-pulse 2s ease-in-out infinite",
-        "solar-pulse": "solar-pulse 3s ease-in-out infinite",
       },
       backgroundImage: {
         "gradient-primary": "var(--gradient-primary)",
