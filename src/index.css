@@ -60,25 +60,22 @@ All colors MUST be HSL.
     
     /* Glass Morphism */
     --glass-bg: hsl(0 0% 100% / 0.7);
-    --glass-border: hsl(250 40% 88% / 0.3);
+    --glass-border: hsl(213 40% 88% / 0.3);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Solar Effects */
+    --solar-flare: linear-gradient(135deg, hsl(8 97% 56%), hsl(51 100% 50%), hsl(8 97% 56%));
+    --corona-glow: 0 0 60px hsl(51 100% 50% / 0.6), 0 0 100px hsl(8 97% 56% / 0.4);
   }
 
   .dark {
@@ -133,6 +130,7 @@ All colors MUST be HSL.
     /* Glass Morphism (Dark) */
     --glass-bg: hsl(258 40% 12% / 0.6);
     --glass-border: hsl(258 30% 22% / 0.3);
+    
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -141,6 +139,10 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Solar Effects (Dark) */
+    --solar-flare: linear-gradient(135deg, hsl(8 97% 60%), hsl(51 100% 55%), hsl(8 97% 60%));
+    --corona-glow: 0 0 80px hsl(51 100% 55% / 0.7), 0 0 120px hsl(8 97% 60% / 0.5);
   }
 }
 
@@ -157,6 +159,7 @@ All colors MUST be HSL.
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold;
+    font-family: 'Orbitron', 'Inter', sans-serif;
     letter-spacing: -0.02em;
   }
 }
@@ -189,16 +192,21 @@ All colors MUST be HSL.
     position: absolute;
     inset: 0;
     background-image: 
-      radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.8), transparent),
-      radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 255, 0.6), transparent),
-      radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.4), transparent),
-      radial-gradient(1px 1px at 80% 10%, rgba(255, 255, 255, 0.5), transparent),
-      radial-gradient(2px 2px at 90% 60%, rgba(255, 255, 255, 0.7), transparent),
+      radial-gradient(3px 3px at 20% 30%, rgba(255, 215, 0, 0.9), transparent),
+      radial-gradient(2px 2px at 60% 70%, rgba(252, 61, 33, 0.7), transparent),
+      radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.6), transparent),
+      radial-gradient(2px 2px at 80% 10%, rgba(255, 215, 0, 0.8), transparent),
+      radial-gradient(3px 3px at 90% 60%, rgba(252, 61, 33, 0.8), transparent),
       radial-gradient(1px 1px at 33% 85%, rgba(255, 255, 255, 0.5), transparent),
-      radial-gradient(1px 1px at 15% 95%, rgba(255, 255, 255, 0.6), transparent);
+      radial-gradient(2px 2px at 15% 95%, rgba(255, 215, 0, 0.7), transparent),
+      radial-gradient(1px 1px at 45% 20%, rgba(255, 255, 255, 0.4), transparent);
     background-size: 200% 200%;
     animation: twinkle 8s ease-in-out infinite;
     pointer-events: none;
+  }
+  
+  .solar-pulse {
+    animation: solar-pulse 3s ease-in-out infinite;
   }
   
   @keyframes twinkle {
@@ -207,8 +215,19 @@ All colors MUST be HSL.
       background-position: 0% 0%;
     }
     50% {
-      opacity: 0.5;
+      opacity: 0.6;
       background-position: 100% 100%;
+    }
+  }
+  
+  @keyframes solar-pulse {
+    0%, 100% {
+      box-shadow: var(--corona-glow);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: var(--shadow-glow);
+      transform: scale(1.02);
     }
   }
 }

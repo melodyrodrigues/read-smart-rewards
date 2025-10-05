@@ -101,31 +101,46 @@ const Index = () => {
   return (
     <div className="min-h-screen cosmic-bg">
       {/* Hero Section */}
-      <div className="relative h-[400px] overflow-hidden">
+      <div className="relative h-[500px] overflow-hidden">
         <img 
           src={heroImage} 
           alt="Hero" 
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />
-        <div className="absolute inset-0 flex flex-col items-start justify-center px-8 md:px-16 max-w-2xl">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent animate-fade-in drop-shadow-[0_0_20px_rgba(168,85,247,0.3)]">
-            Cosmo Reader
-          </h1>
+        <div className="absolute inset-0 bg-gradient-to-r from-background/98 via-background/85 to-background/40" />
+        
+        {/* Solar flare accent */}
+        <div className="absolute top-20 right-20 w-96 h-96 rounded-full opacity-20 blur-3xl" 
+             style={{ background: 'var(--solar-flare)' }} />
+        
+        <div className="absolute inset-0 flex flex-col items-start justify-center px-8 md:px-16 max-w-3xl">
+          <div className="space-y-2 mb-6">
+            <div className="inline-block px-4 py-1 bg-accent/20 border border-accent/30 rounded-full text-accent text-xs font-semibold tracking-wider uppercase backdrop-blur-sm">
+              NASA-Powered Reading Experience
+            </div>
+            <h1 className="text-6xl md:text-7xl font-bold bg-gradient-primary bg-clip-text text-transparent animate-fade-in drop-shadow-[0_0_30px_rgba(252,61,33,0.4)] tracking-tight">
+              COSMO READER
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-xl">
+              Explore the universe of knowledge with AI-powered assistance and real-time space weather data
+            </p>
+          </div>
           <div className="flex gap-3">
             <Button 
               onClick={() => navigate("/space-weather")}
-              className="bg-gradient-primary hover:opacity-90 animate-scale-in"
+              size="lg"
+              className="bg-gradient-primary hover:opacity-90 animate-scale-in solar-pulse shadow-glow"
             >
-              <Sparkles className="mr-2 h-4 w-4" />
-              Space Weather Glossary
+              <Sparkles className="mr-2 h-5 w-5" />
+              Space Weather
             </Button>
             <Button 
               onClick={handleSignOut}
+              size="lg"
               variant="outline"
-              className="animate-scale-in glass-card"
+              className="animate-scale-in glass-card hover:bg-accent/10"
             >
-              <LogOut className="mr-2 h-4 w-4" />
+              <LogOut className="mr-2 h-5 w-5" />
               Sign Out
             </Button>
           </div>
@@ -133,24 +148,24 @@ const Index = () => {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-12">
         <Tabs defaultValue="library" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
-            <TabsTrigger value="library" className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4" />
-              Library
+          <TabsList className="grid w-full grid-cols-4 mb-8 glass-card p-1 h-14">
+            <TabsTrigger value="library" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+              <BookOpen className="w-5 h-5" />
+              <span className="hidden sm:inline">Library</span>
             </TabsTrigger>
-            <TabsTrigger value="keywords" className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4" />
-              Keywords
+            <TabsTrigger value="keywords" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+              <Sparkles className="w-5 h-5" />
+              <span className="hidden sm:inline">Keywords</span>
             </TabsTrigger>
-            <TabsTrigger value="assistant" className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" />
-              Assistant
+            <TabsTrigger value="assistant" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+              <MessageSquare className="w-5 h-5" />
+              <span className="hidden sm:inline">Assistant</span>
             </TabsTrigger>
-            <TabsTrigger value="achievements" className="flex items-center gap-2">
-              <Trophy className="w-4 h-4" />
-              Achievements
+            <TabsTrigger value="achievements" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+              <Trophy className="w-5 h-5" />
+              <span className="hidden sm:inline">Achievements</span>
             </TabsTrigger>
           </TabsList>
 
@@ -191,19 +206,29 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="achievements">
-            <div className="max-w-6xl mx-auto space-y-8">
-              <div>
-                <h2 className="text-3xl font-bold mb-2 text-center bg-gradient-primary bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(168,85,247,0.4)]">
-                  🌟 Stellar Achievements
-                </h2>
-                <p className="text-center text-muted-foreground mb-8">
-                  Complete missions and explore telescope keywords
+            <div className="max-w-6xl mx-auto space-y-12">
+              <div className="text-center space-y-4">
+                <div className="inline-block">
+                  <h2 className="text-4xl md:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(252,61,33,0.5)] tracking-tight">
+                    STELLAR ACHIEVEMENTS
+                  </h2>
+                </div>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Complete missions and explore keywords to unlock exclusive NASA-inspired badges
                 </p>
+                <div className="flex items-center justify-center gap-2 text-accent">
+                  <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-accent"></div>
+                  <Sparkles className="w-5 h-5" />
+                  <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-accent"></div>
+                </div>
               </div>
 
               {/* Library Mission Badges */}
-              <div>
-                <h3 className="text-xl font-semibold mb-4 text-center">Library Mission Badges</h3>
+              <div className="glass-card p-8 rounded-lg">
+                <h3 className="text-2xl font-semibold mb-6 text-center flex items-center justify-center gap-2">
+                  <BookOpen className="w-6 h-6 text-primary" />
+                  Library Mission Badges
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <AchievementBadge
                     type="reader"
@@ -224,8 +249,11 @@ const Index = () => {
               </div>
 
               {/* Keywords Explorer Badges */}
-              <div>
-                <h3 className="text-xl font-semibold mb-4 text-center">Keywords Explorer Badges</h3>
+              <div className="glass-card p-8 rounded-lg">
+                <h3 className="text-2xl font-semibold mb-6 text-center flex items-center justify-center gap-2">
+                  <Sparkles className="w-6 h-6 text-accent" />
+                  Keywords Explorer Badges
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <AchievementBadge
                     type="keyword-bronze"

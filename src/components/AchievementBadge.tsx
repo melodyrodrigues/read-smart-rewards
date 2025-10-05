@@ -76,34 +76,44 @@ const AchievementBadge = ({ type, earned = false, description }: AchievementBadg
   const badge = BADGE_MAP[type];
 
   return (
-    <Card className={`glass-card p-6 text-center transition-all duration-500 ${
+    <Card className={`glass-card p-8 text-center transition-all duration-500 border ${
       earned 
-        ? `${badge.glow} animate-glow-pulse scale-100 hover:scale-105` 
-        : "opacity-40 grayscale hover:opacity-60"
+        ? `${badge.glow} animate-glow-pulse scale-100 hover:scale-105 border-primary/30` 
+        : "opacity-40 grayscale hover:opacity-60 border-border/50"
     }`}>
-      <div className="relative w-28 h-28 mx-auto mb-4">
-        <div className={`absolute inset-0 ${earned ? badge.gradient : ""} rounded-full opacity-20 blur-2xl animate-pulse`} />
+      {/* Top accent line */}
+      {earned && (
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-primary" />
+      )}
+      
+      <div className="relative w-32 h-32 mx-auto mb-6">
+        <div className={`absolute inset-0 ${earned ? badge.gradient : ""} rounded-full opacity-20 blur-3xl ${earned ? 'animate-pulse' : ''}`} />
         <img 
           src={badge.img} 
           alt={badge.title}
-          className={`relative w-full h-full object-contain transition-transform duration-300 ${
-            earned ? "drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]" : ""
+          className={`relative w-full h-full object-contain transition-transform duration-500 ${
+            earned ? "drop-shadow-[0_0_20px_rgba(255,255,255,0.6)] hover:rotate-12" : ""
           }`}
         />
       </div>
-      <h3 className={`text-lg font-bold mb-2 transition-all duration-300 ${
-        earned 
-          ? `${badge.gradient} bg-clip-text text-transparent drop-shadow-sm` 
-          : "text-muted-foreground"
-      }`}>
-        {badge.title}
-      </h3>
-      <p className="text-sm text-muted-foreground">{description}</p>
-      {earned && (
-        <div className="mt-3 text-xs font-semibold text-primary animate-fade-in">
-          ✨ Achievement Unlocked!
-        </div>
-      )}
+      
+      <div className="space-y-2">
+        <h3 className={`text-xl font-bold tracking-wide transition-all duration-300 ${
+          earned 
+            ? `${badge.gradient} bg-clip-text text-transparent drop-shadow-sm` 
+            : "text-muted-foreground"
+        }`}>
+          {badge.title}
+        </h3>
+        <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+        {earned && (
+          <div className="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 animate-fade-in">
+            <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+              ✨ Unlocked
+            </span>
+          </div>
+        )}
+      </div>
     </Card>
   );
 };
