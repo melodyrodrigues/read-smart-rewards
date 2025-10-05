@@ -37,7 +37,17 @@ Total Notifications: ${spaceWeatherData.notifications?.count || 0}
 2. Provide a brief, fascinating description (2-3 sentences in Portuguese)
 3. Assign a category: "solar", "magnetosphere", "radiation", "aurora", or "cosmic"
 4. Give it a relevance score (1-100) based on current activity
-5. Suggest a relevant NASA resource URL
+5. Provide a REAL, working URL to learn more about the topic. Use actual websites like:
+   - https://www.spaceweather.com/
+   - https://www.swpc.noaa.gov/
+   - https://science.nasa.gov/heliophysics/
+   - https://sdo.gsfc.nasa.gov/
+   - https://www.nasa.gov/solar-system/
+   - https://www.esa.int/Science_Exploration/Space_Science/
+   - https://www.nationalgeographic.com/ (for general space topics)
+   - https://www.space.com/ (for space news)
+
+IMPORTANT: The URLs must be REAL and currently accessible. Match the URL to the specific topic (e.g., aurora topics should link to aurora-related pages).
 
 Focus on making the topics educational, engaging, and connected to current space weather conditions.`;
 
