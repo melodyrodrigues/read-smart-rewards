@@ -1,16 +1,18 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Volume2, Sparkles } from "lucide-react";
+import { Volume2, Sparkles, Video, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 interface GlossaryTerm {
   term: string;
   definition: string;
   category?: string;
+  videoUrl?: string;
 }
 
 interface GlossaryPopoverProps {
@@ -23,78 +25,95 @@ const glossaryTerms: Record<string, GlossaryTerm> = {
   ionosphere: {
     term: "Ionosphere",
     definition: "The ionosphere is a layer of Earth's atmosphere filled with electrically charged particles. It plays a crucial role in radio communications and is affected by solar activity.",
-    category: "Atmosphere"
+    category: "Atmosphere",
+    videoUrl: "https://www.youtube.com/watch?v=FG3-p4AiXXU"
   },
   ionosfera: {
     term: "Ionosfera",
     definition: "A ionosfera é uma camada da atmosfera terrestre ionizada pela radiação solar. Ela se estende de aproximadamente 60 km a 1000 km de altitude e é crucial para a propagação de ondas de rádio.",
-    category: "Camada Atmosférica"
+    category: "Camada Atmosférica",
+    videoUrl: "https://www.youtube.com/watch?v=FG3-p4AiXXU"
   },
   aurora: {
     term: "Aurora",
     definition: "Auroras are natural light displays in Earth's sky, predominantly seen in high-latitude regions. They are caused by disturbances in the magnetosphere caused by solar wind.",
-    category: "Phenomenon"
+    category: "Phenomenon",
+    videoUrl: "https://www.youtube.com/watch?v=czMh3BnHFHQ"
   },
   magnetosphere: {
     term: "Magnetosphere",
     definition: "The magnetosphere is the region of space surrounding Earth where the planet's magnetic field is the dominant force controlling the behavior of charged particles.",
-    category: "Space"
+    category: "Space",
+    videoUrl: "https://www.youtube.com/watch?v=5l3tRSI-4Yk"
   },
   magnetosfera: {
     term: "Magnetosfera",
     definition: "A magnetosfera é a região do espaço ao redor da Terra dominada pelo campo magnético terrestre. Ela protege o planeta das partículas carregadas do vento solar.",
-    category: "Região Espacial"
+    category: "Região Espacial",
+    videoUrl: "https://www.youtube.com/watch?v=5l3tRSI-4Yk"
   },
   radiation: {
     term: "Radiation",
     definition: "Radiation is energy that travels through space as waves or particles. Solar radiation includes electromagnetic radiation from the sun.",
-    category: "Physics"
+    category: "Physics",
+    videoUrl: "https://www.youtube.com/watch?v=0bLEb8ZuwGw"
   },
   radiacao: {
     term: "Radiação",
     definition: "Radiação espacial refere-se a partículas de alta energia (prótons, elétrons) e raios cósmicos que viajam pelo espaço. Pode ser perigosa para satélites e astronautas.",
-    category: "Clima Espacial"
+    category: "Clima Espacial",
+    videoUrl: "https://www.youtube.com/watch?v=0bLEb8ZuwGw"
   },
   satellite: {
     term: "Satellite",
     definition: "A satellite is an object that orbits around a larger object. Artificial satellites are used for communications, navigation, and Earth observation.",
-    category: "Technology"
+    category: "Technology",
+    videoUrl: "https://www.youtube.com/watch?v=VKlW8xAqM3k"
   },
   satelite: {
     term: "Satélite",
     definition: "Satélites artificiais são objetos lançados ao espaço que orbitam a Terra. São afetados pelo clima espacial, especialmente por tempestades solares e radiação.",
-    category: "Tecnologia Espacial"
+    category: "Tecnologia Espacial",
+    videoUrl: "https://www.youtube.com/watch?v=VKlW8xAqM3k"
   },
   solar: {
     term: "Solar",
     definition: "Solar relates to the Sun. Solar activity includes phenomena like solar flares and coronal mass ejections that can affect Earth.",
-    category: "Sun"
+    category: "Sun",
+    videoUrl: "https://www.youtube.com/watch?v=3aWLN8qRtz8"
   },
   cosmic: {
     term: "Cosmic",
     definition: "Cosmic relates to the universe or outer space, especially as distinct from Earth. Cosmic rays are high-energy particles from space.",
-    category: "Space"
+    category: "Space",
+    videoUrl: "https://www.youtube.com/watch?v=GJ4Qp2xeRds"
   },
   cosmico: {
     term: "Raios Cósmicos",
     definition: "Raios cósmicos são partículas de alta energia que se originam fora do sistema solar. Eles podem afetar satélites e até mesmo a atmosfera terrestre.",
-    category: "Fenômeno Espacial"
+    category: "Fenômeno Espacial",
+    videoUrl: "https://www.youtube.com/watch?v=GJ4Qp2xeRds"
   },
   atmosphere: {
     term: "Atmosphere",
     definition: "The atmosphere is the layer of gases surrounding Earth, held in place by gravity. It protects life and affects weather and climate.",
-    category: "Earth"
+    category: "Earth",
+    videoUrl: "https://www.youtube.com/watch?v=VBgRU-Kn8ts"
   },
   atmosfera: {
     term: "Atmosfera",
     definition: "A atmosfera terrestre é a camada de gases que envolve o planeta. É dividida em várias camadas (troposfera, estratosfera, mesosfera, termosfera, exosfera) e interage constantemente com o clima espacial.",
-    category: "Camada Terrestre"
+    category: "Camada Terrestre",
+    videoUrl: "https://www.youtube.com/watch?v=VBgRU-Kn8ts"
   }
 };
 
 export const GlossaryPopover = ({ term, children }: GlossaryPopoverProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const termKey = term.toLowerCase().replace(/[^a-z]/g, '');
   const glossaryEntry = glossaryTerms[termKey];
@@ -108,18 +127,77 @@ export const GlossaryPopover = ({ term, children }: GlossaryPopoverProps) => {
     if (open) {
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 600);
+    } else {
+      // Stop audio when closing
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      setIsPlayingAudio(false);
     }
   };
 
-  const speakDefinition = () => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(glossaryEntry.definition);
-      // Auto-detect language based on term
-      utterance.lang = glossaryEntry.definition.includes('é') || glossaryEntry.definition.includes('ã') ? 'pt-BR' : 'en-US';
-      utterance.rate = 0.9;
-      utterance.pitch = 1;
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
+  const speakDefinition = async () => {
+    if (!glossaryEntry || isLoadingAudio) return;
+    
+    // Stop current audio if playing
+    if (audioRef.current && isPlayingAudio) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setIsPlayingAudio(false);
+      return;
+    }
+    
+    setIsLoadingAudio(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('text-to-speech', {
+        body: {
+          text: `${glossaryEntry.term}. ${glossaryEntry.definition}`,
+          voice: 'alloy'
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.audioContent) {
+        // Convert base64 to audio blob
+        const binaryString = atob(data.audioContent);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: 'audio/mpeg' });
+        const audioUrl = URL.createObjectURL(blob);
+        
+        // Create and play audio
+        if (audioRef.current) {
+          audioRef.current.src = audioUrl;
+        } else {
+          audioRef.current = new Audio(audioUrl);
+        }
+        
+        audioRef.current.onended = () => {
+          setIsPlayingAudio(false);
+          URL.revokeObjectURL(audioUrl);
+        };
+        
+        audioRef.current.play();
+        setIsPlayingAudio(true);
+      }
+    } catch (error) {
+      console.error('Error generating speech:', error);
+      // Fallback to browser TTS
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(glossaryEntry.definition);
+        utterance.lang = glossaryEntry.definition.includes('é') || glossaryEntry.definition.includes('ã') ? 'pt-BR' : 'en-US';
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utterance);
+      }
+    } finally {
+      setIsLoadingAudio(false);
     }
   };
 
@@ -146,7 +224,7 @@ export const GlossaryPopover = ({ term, children }: GlossaryPopoverProps) => {
           
           <div className="p-4 space-y-3">
             <div className="flex items-start justify-between gap-2">
-              <div>
+              <div className="flex-1">
                 <h3 className="font-bold text-lg text-primary flex items-center gap-2">
                   {glossaryEntry.term}
                 </h3>
@@ -156,15 +234,35 @@ export const GlossaryPopover = ({ term, children }: GlossaryPopoverProps) => {
                   </span>
                 )}
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={speakDefinition}
-                className="shrink-0 hover:bg-primary/10"
-                title="Listen to definition"
-              >
-                <Volume2 className="w-4 h-4 text-primary" />
-              </Button>
+              
+              <div className="flex gap-1 shrink-0">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={speakDefinition}
+                  disabled={isLoadingAudio}
+                  className="hover:bg-primary/10"
+                  title={isPlayingAudio ? "Stop audio" : "Listen to definition"}
+                >
+                  {isLoadingAudio ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                  ) : (
+                    <Volume2 className={`w-4 h-4 text-primary ${isPlayingAudio ? 'animate-pulse' : ''}`} />
+                  )}
+                </Button>
+                
+                {glossaryEntry.videoUrl && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => window.open(glossaryEntry.videoUrl, '_blank')}
+                    className="hover:bg-accent/10"
+                    title="Watch NASA video"
+                  >
+                    <Video className="w-4 h-4 text-accent" />
+                  </Button>
+                )}
+              </div>
             </div>
             
             <p className="text-sm leading-relaxed text-foreground/90">
