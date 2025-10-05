@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Upload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface UploadBookProps {
   onUploadComplete: () => void;
@@ -18,6 +19,7 @@ const UploadBook = ({ onUploadComplete }: UploadBookProps) => {
   const [totalPages, setTotalPages] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +45,7 @@ const UploadBook = ({ onUploadComplete }: UploadBookProps) => {
         .getPublicUrl(filePath);
 
       // Create book record
-      const { error: insertError } = await supabase
+      const { data: inserted, error: insertError } = await supabase
         .from("books")
         .insert({
           title,
@@ -51,7 +53,9 @@ const UploadBook = ({ onUploadComplete }: UploadBookProps) => {
           file_url: publicUrl,
           total_pages: parseInt(totalPages) || 0,
           user_id: user.id,
-        });
+        })
+        .select("id")
+        .single();
 
       if (insertError) throw insertError;
 
