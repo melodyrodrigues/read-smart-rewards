@@ -9,6 +9,8 @@ import { ArrowLeft, ChevronLeft, ChevronRight, MessageSquare } from "lucide-reac
 import { useToast } from "@/hooks/use-toast";
 import ChatAssistant from "@/components/ChatAssistant";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { GlossaryIndicator } from "@/components/GlossaryIndicator";
+import { GlossaryPanel } from "@/components/GlossaryPanel";
 
 const Reader = () => {
   const [searchParams] = useSearchParams();
@@ -130,6 +132,8 @@ const Reader = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <GlossaryIndicator />
+      
       {/* Header */}
       <div className="border-b glass-card">
         <div className="container mx-auto px-4 py-4">
@@ -143,17 +147,21 @@ const Reader = () => {
               Back
             </Button>
 
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" className="gap-2 glass-card border-primary/20 hover:bg-primary/10">
-                  <MessageSquare className="w-4 h-4" />
-                  Assistant
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-full sm:max-w-lg glass-card">
-                <ChatAssistant bookContext={`${book.title}${book.author ? ` - ${book.author}` : ''} (page ${currentPage}/${book.total_pages})`} />
-              </SheetContent>
-            </Sheet>
+            <div className="flex gap-2">
+              <GlossaryPanel />
+              
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" className="gap-2 glass-card border-primary/20 hover:bg-primary/10">
+                    <MessageSquare className="w-4 h-4" />
+                    Assistant
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-full sm:max-w-lg glass-card">
+                  <ChatAssistant bookContext={`${book.title}${book.author ? ` - ${book.author}` : ''} (page ${currentPage}/${book.total_pages})`} />
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
 
           <div className="space-y-3">
