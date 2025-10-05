@@ -101,6 +101,9 @@ export default {
         "gradient-primary": "var(--gradient-primary)",
         "gradient-hero": "var(--gradient-hero)",
         "gradient-card": "var(--gradient-card)",
+        "gradient-badge-reader": "var(--gradient-badge-reader)",
+        "gradient-badge-scholar": "var(--gradient-badge-scholar)",
+        "gradient-badge-master": "var(--gradient-badge-master)",
       },
       boxShadow: {
         "glow": "var(--shadow-glow)",

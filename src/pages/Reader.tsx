@@ -131,13 +131,13 @@ const Reader = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b bg-card">
+      <div className="border-b glass-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <Button
               variant="ghost"
               onClick={() => navigate("/")}
-              className="gap-2"
+              className="gap-2 hover:bg-primary/10 transition-all"
             >
               <ArrowLeft className="w-4 h-4" />
               Voltar
@@ -145,20 +145,20 @@ const Reader = () => {
 
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 glass-card border-primary/20 hover:bg-primary/10">
                   <MessageSquare className="w-4 h-4" />
                   Assistente
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full sm:max-w-lg">
-                <ChatAssistant bookContext={`Livro: ${book.title} por ${book.author}`} />
+              <SheetContent side="right" className="w-full sm:max-w-lg glass-card">
+                <ChatAssistant bookContext={`${book.title}${book.author ? ` - ${book.author}` : ''} (pág. ${currentPage}/${book.total_pages})`} />
               </SheetContent>
             </Sheet>
           </div>
 
           <div className="space-y-3">
             <div>
-              <h1 className="text-2xl font-bold">{book.title}</h1>
+              <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">{book.title}</h1>
               {book.author && (
                 <p className="text-muted-foreground">{book.author}</p>
               )}
@@ -167,7 +167,7 @@ const Reader = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span>Progresso: {pagesRead} de {book.total_pages} páginas</span>
-                <span>{progressPercent.toFixed(0)}%</span>
+                <span className="font-semibold text-primary">{progressPercent.toFixed(0)}%</span>
               </div>
               <Progress value={progressPercent} className="h-2" />
             </div>
@@ -177,7 +177,7 @@ const Reader = () => {
 
       {/* PDF Viewer */}
       <div className="container mx-auto px-4 py-6">
-        <Card className="overflow-hidden shadow-glow">
+        <Card className="glass-card overflow-hidden">
           <div className="aspect-[3/4] bg-secondary/20">
             <iframe
               src={`${book.file_url}#page=${currentPage}`}
@@ -187,12 +187,13 @@ const Reader = () => {
           </div>
 
           {/* Controls */}
-          <div className="p-4 border-t flex items-center justify-between gap-4">
+          <div className="p-4 border-t glass-card flex items-center justify-between gap-4">
             <Button
               variant="outline"
               size="sm"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage <= 1}
+              className="hover:bg-primary hover:text-primary-foreground transition-all"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
@@ -203,7 +204,7 @@ const Reader = () => {
                 type="number"
                 value={pageInput}
                 onChange={(e) => setPageInput(e.target.value)}
-                className="w-20 text-center"
+                className="w-20 text-center glass-card"
                 min={1}
                 max={book.total_pages}
               />
@@ -217,6 +218,7 @@ const Reader = () => {
               size="sm"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage >= book.total_pages}
+              className="hover:bg-primary hover:text-primary-foreground transition-all"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>

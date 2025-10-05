@@ -26,7 +26,7 @@ const BookCard = ({ book, progress, onDelete, onClick }: BookCardProps) => {
 
   return (
     <Card 
-      className="group relative overflow-hidden hover:shadow-glow transition-all duration-300 cursor-pointer animate-scale-in bg-gradient-card"
+      className="glass-card-hover group relative overflow-hidden cursor-pointer"
       onClick={onClick}
     >
       <div className="aspect-[3/4] bg-secondary/50 flex items-center justify-center relative overflow-hidden">

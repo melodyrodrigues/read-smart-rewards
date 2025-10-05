@@ -42,12 +42,22 @@ All colors MUST be HSL.
 
     --radius: 1rem;
     
+    /* Gradientes Roxo → Violeta */
     --gradient-primary: linear-gradient(135deg, hsl(270 80% 60%), hsl(285 85% 65%));
     --gradient-hero: linear-gradient(135deg, hsl(270 80% 55%), hsl(285 85% 60%), hsl(300 85% 65%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(250 60% 98%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100% / 0.9), hsl(250 60% 98% / 0.8));
+    --gradient-badge-reader: linear-gradient(135deg, hsl(45 100% 60%), hsl(35 100% 55%));
+    --gradient-badge-scholar: linear-gradient(135deg, hsl(210 15% 60%), hsl(220 15% 50%));
+    --gradient-badge-master: linear-gradient(135deg, hsl(270 80% 60%), hsl(285 85% 65%));
     
+    /* Sombras e Glow */
     --shadow-glow: 0 0 30px hsl(270 80% 60% / 0.3);
     --shadow-card: 0 4px 20px hsl(270 20% 50% / 0.08);
+    --shadow-glass: 0 8px 32px hsl(270 30% 40% / 0.1);
+    
+    /* Glass Morphism */
+    --glass-bg: hsl(0 0% 100% / 0.7);
+    --glass-border: hsl(250 40% 88% / 0.3);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -101,12 +111,22 @@ All colors MUST be HSL.
     --input: 258 30% 22%;
     --ring: 270 80% 65%;
     
+    /* Gradientes Roxo → Violeta (Dark) */
     --gradient-primary: linear-gradient(135deg, hsl(270 80% 60%), hsl(285 85% 65%));
     --gradient-hero: linear-gradient(135deg, hsl(270 80% 50%), hsl(285 85% 55%), hsl(300 85% 60%));
-    --gradient-card: linear-gradient(180deg, hsl(258 40% 12%), hsl(258 35% 15%));
+    --gradient-card: linear-gradient(180deg, hsl(258 40% 12% / 0.9), hsl(258 35% 15% / 0.8));
+    --gradient-badge-reader: linear-gradient(135deg, hsl(45 100% 55%), hsl(35 100% 50%));
+    --gradient-badge-scholar: linear-gradient(135deg, hsl(210 15% 55%), hsl(220 15% 45%));
+    --gradient-badge-master: linear-gradient(135deg, hsl(270 80% 55%), hsl(285 85% 60%));
     
+    /* Sombras e Glow (Dark) */
     --shadow-glow: 0 0 40px hsl(270 80% 60% / 0.4);
     --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.3);
+    --shadow-glass: 0 8px 32px hsl(0 0% 0% / 0.4);
+    
+    /* Glass Morphism (Dark) */
+    --glass-bg: hsl(258 40% 12% / 0.6);
+    --glass-border: hsl(258 30% 22% / 0.3);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -125,5 +145,31 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    letter-spacing: -0.01em;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass);
+  }
+  
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300;
+  }
+  
+  .glass-card-hover:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
   }
 }

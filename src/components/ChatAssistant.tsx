@@ -128,12 +128,15 @@ const ChatAssistant = ({ bookContext }: ChatAssistantProps) => {
   };
 
   return (
-    <Card className="flex flex-col h-[600px] shadow-glow">
+    <Card className="glass-card flex flex-col h-[600px]">
       <div className="p-4 border-b bg-gradient-primary">
         <h2 className="text-lg font-semibold text-white flex items-center gap-2">
           <Bot className="w-5 h-5" />
           Assistente de Leitura
         </h2>
+        {bookContext && (
+          <p className="text-xs text-white/80 mt-1">{bookContext}</p>
+        )}
       </div>
 
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
@@ -192,7 +195,7 @@ const ChatAssistant = ({ bookContext }: ChatAssistantProps) => {
           <Button
             type="submit"
             disabled={isLoading || !input.trim()}
-            className="bg-gradient-primary"
+            className="bg-gradient-primary hover:opacity-90 transition-opacity"
           >
             <Send className="w-4 h-4" />
           </Button>
