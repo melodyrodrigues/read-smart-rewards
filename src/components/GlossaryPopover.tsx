@@ -25,6 +25,11 @@ const glossaryTerms: Record<string, GlossaryTerm> = {
     definition: "The ionosphere is a layer of Earth's atmosphere filled with electrically charged particles. It plays a crucial role in radio communications and is affected by solar activity.",
     category: "Atmosphere"
   },
+  ionosfera: {
+    term: "Ionosfera",
+    definition: "A ionosfera é uma camada da atmosfera terrestre ionizada pela radiação solar. Ela se estende de aproximadamente 60 km a 1000 km de altitude e é crucial para a propagação de ondas de rádio.",
+    category: "Camada Atmosférica"
+  },
   aurora: {
     term: "Aurora",
     definition: "Auroras are natural light displays in Earth's sky, predominantly seen in high-latitude regions. They are caused by disturbances in the magnetosphere caused by solar wind.",
@@ -35,15 +40,30 @@ const glossaryTerms: Record<string, GlossaryTerm> = {
     definition: "The magnetosphere is the region of space surrounding Earth where the planet's magnetic field is the dominant force controlling the behavior of charged particles.",
     category: "Space"
   },
+  magnetosfera: {
+    term: "Magnetosfera",
+    definition: "A magnetosfera é a região do espaço ao redor da Terra dominada pelo campo magnético terrestre. Ela protege o planeta das partículas carregadas do vento solar.",
+    category: "Região Espacial"
+  },
   radiation: {
     term: "Radiation",
     definition: "Radiation is energy that travels through space as waves or particles. Solar radiation includes electromagnetic radiation from the sun.",
     category: "Physics"
   },
+  radiacao: {
+    term: "Radiação",
+    definition: "Radiação espacial refere-se a partículas de alta energia (prótons, elétrons) e raios cósmicos que viajam pelo espaço. Pode ser perigosa para satélites e astronautas.",
+    category: "Clima Espacial"
+  },
   satellite: {
     term: "Satellite",
     definition: "A satellite is an object that orbits around a larger object. Artificial satellites are used for communications, navigation, and Earth observation.",
     category: "Technology"
+  },
+  satelite: {
+    term: "Satélite",
+    definition: "Satélites artificiais são objetos lançados ao espaço que orbitam a Terra. São afetados pelo clima espacial, especialmente por tempestades solares e radiação.",
+    category: "Tecnologia Espacial"
   },
   solar: {
     term: "Solar",
@@ -55,10 +75,20 @@ const glossaryTerms: Record<string, GlossaryTerm> = {
     definition: "Cosmic relates to the universe or outer space, especially as distinct from Earth. Cosmic rays are high-energy particles from space.",
     category: "Space"
   },
+  cosmico: {
+    term: "Raios Cósmicos",
+    definition: "Raios cósmicos são partículas de alta energia que se originam fora do sistema solar. Eles podem afetar satélites e até mesmo a atmosfera terrestre.",
+    category: "Fenômeno Espacial"
+  },
   atmosphere: {
     term: "Atmosphere",
     definition: "The atmosphere is the layer of gases surrounding Earth, held in place by gravity. It protects life and affects weather and climate.",
     category: "Earth"
+  },
+  atmosfera: {
+    term: "Atmosfera",
+    definition: "A atmosfera terrestre é a camada de gases que envolve o planeta. É dividida em várias camadas (troposfera, estratosfera, mesosfera, termosfera, exosfera) e interage constantemente com o clima espacial.",
+    category: "Camada Terrestre"
   }
 };
 
@@ -84,7 +114,8 @@ export const GlossaryPopover = ({ term, children }: GlossaryPopoverProps) => {
   const speakDefinition = () => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(glossaryEntry.definition);
-      utterance.lang = 'en-US';
+      // Auto-detect language based on term
+      utterance.lang = glossaryEntry.definition.includes('é') || glossaryEntry.definition.includes('ã') ? 'pt-BR' : 'en-US';
       utterance.rate = 0.9;
       utterance.pitch = 1;
       window.speechSynthesis.cancel();

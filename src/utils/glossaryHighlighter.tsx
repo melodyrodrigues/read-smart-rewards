@@ -4,13 +4,22 @@ import { GlossaryPopover } from "@/components/GlossaryPopover";
 // Keywords to highlight in the text
 const glossaryKeywords = [
   "ionosphere",
+  "ionosfera",
   "aurora",
   "magnetosphere",
+  "magnetosfera",
   "radiation",
+  "radiacao",
+  "radiação",
   "satellite",
+  "satelite",
+  "satélite",
   "solar",
   "cosmic",
+  "cosmico",
+  "cósmico",
   "atmosphere",
+  "atmosfera",
 ];
 
 /**

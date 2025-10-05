@@ -7,13 +7,19 @@ import { Card } from "@/components/ui/card";
 
 const glossaryTerms = [
   "ionosphere",
+  "ionosfera",
   "aurora",
   "magnetosphere",
+  "magnetosfera",
   "radiation",
+  "radiacao",
   "satellite",
+  "satelite",
   "solar",
   "cosmic",
+  "cosmico",
   "atmosphere",
+  "atmosfera",
 ];
 
 export const GlossaryPanel = () => {
