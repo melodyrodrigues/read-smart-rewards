@@ -29,7 +29,7 @@ const BookCard = ({ book, progress, onDelete, onClick }: BookCardProps) => {
       className="glass-card-hover group relative overflow-hidden cursor-pointer"
       onClick={onClick}
     >
-      <div className="aspect-[3/4] bg-secondary/50 flex items-center justify-center relative overflow-hidden">
+      <div className="aspect-[3/4] flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-background to-muted/30">
         {book.cover_url ? (
           <img 
             src={book.cover_url} 
@@ -37,7 +37,23 @@ const BookCard = ({ book, progress, onDelete, onClick }: BookCardProps) => {
             className="w-full h-full object-cover"
           />
         ) : (
-          <BookOpen className="w-16 h-16 text-primary/50" />
+          <div className="relative">
+            <BookOpen 
+              className="w-16 h-16" 
+              style={{
+                fill: 'url(#cosmosGradient)',
+                stroke: 'url(#cosmosGradient)',
+              }}
+            />
+            <svg width="0" height="0" style={{ position: 'absolute' }}>
+              <defs>
+                <linearGradient id="cosmosGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="hsl(270 60% 50%)" />
+                  <stop offset="100%" stopColor="hsl(190 70% 45%)" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
         )}
         {onDelete && (
           <Button
