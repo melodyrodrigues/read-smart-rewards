@@ -23,6 +23,7 @@ const Reader = () => {
   const [pagesRead, setPagesRead] = useState(0);
   const [loading, setLoading] = useState(true);
   const [pageInput, setPageInput] = useState("1");
+  const [viewUrl, setViewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!bookId) {
@@ -31,6 +32,28 @@ const Reader = () => {
     }
     loadBook();
   }, [bookId]);
+  
+  const extractStoragePath = (url: string): string | null => {
+    try {
+      const marker = "/object/";
+      const idx = url.indexOf(marker);
+      if (idx === -1) return null;
+      const rest = url.slice(idx + marker.length); // e.g., public/books/userid/file.pdf
+      const clean = rest.split("?")[0];
+      const parts = clean.split("/");
+      // patterns: public/books/<path...> OR sign/books/<path...>
+      if ((parts[0] === "public" || parts[0] === "sign") && parts[1] === "books") {
+        return parts.slice(2).join("/");
+      }
+      // fallback: books/<path...>
+      if (parts[0] === "books") {
+        return parts.slice(1).join("/");
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
 
   const loadBook = async () => {
     try {
@@ -54,6 +77,21 @@ const Reader = () => {
         setPagesRead(progressData.pages_read || 0);
         setPageInput(String(progressData.current_page || 1));
       }
+
+      // Generate a signed URL for private buckets or fallback to stored URL
+      let urlForView: string | null = bookData.file_url || null;
+      const storagePath = bookData.file_url ? extractStoragePath(bookData.file_url) : null;
+      if (storagePath) {
+        const { data: signed, error: signErr } = await supabase
+          .storage
+          .from("books")
+          .createSignedUrl(storagePath, 60 * 60); // 1 hour
+        if (!signErr && signed?.signedUrl) {
+          urlForView = signed.signedUrl;
+        }
+      }
+      setViewUrl(urlForView);
+
     } catch (error: any) {
       toast({
         title: "Error loading book",
@@ -188,7 +226,7 @@ const Reader = () => {
         <Card className="glass-card overflow-hidden">
           <div className="aspect-[3/4] bg-secondary/20">
             <iframe
-              src={`${book.file_url}#page=${currentPage}`}
+              src={`${(viewUrl || book.file_url)}#page=${currentPage}`}
               className="w-full h-full"
               title={book.title}
             />
