@@ -10,33 +10,46 @@ import { ArrowLeft, Sun, Zap, Radio, AlertTriangle, RefreshCw } from "lucide-rea
 import { useToast } from "@/hooks/use-toast";
 import { GlossaryPopover } from "@/components/GlossaryPopover";
 
-interface SolarFlare {
-  flrID: string;
-  beginTime: string;
-  peakTime: string;
-  classType: string;
-  sourceLocation: string;
-}
-
-interface CME {
-  activityID: string;
-  startTime: string;
-  latitude: number;
-  longitude: number;
-  speed: number;
-}
-
-interface GeomagneticStorm {
-  gstID: string;
-  startTime: string;
-  kpIndex: number;
-}
-
 interface SpaceWeatherData {
-  solarFlares: SolarFlare[];
-  cme: CME[];
-  geomagneticStorms: GeomagneticStorm[];
-  notifications: any[];
+  timestamp: string;
+  period: {
+    start: string;
+    end: string;
+  };
+  solarFlares?: {
+    count: number;
+    recent: Array<{
+      date: string;
+      class: string;
+      peakTime: string;
+      sourceLocation?: string;
+    }>;
+  };
+  coronalMassEjections?: {
+    count: number;
+    recent: Array<{
+      date: string;
+      speed?: number;
+      type?: string;
+      note?: string;
+    }>;
+  };
+  geomagneticStorms?: {
+    count: number;
+    recent: Array<{
+      date: string;
+      kpIndex?: number;
+      linkedEvents?: any[];
+    }>;
+  };
+  notifications?: {
+    count: number;
+    recent: Array<{
+      date: string;
+      type: string;
+      body: string;
+    }>;
+  };
 }
 
 const SpaceWeather = () => {
@@ -149,7 +162,7 @@ const SpaceWeather = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-primary">
-                    {data?.solarFlares?.length || 0}
+                    {data?.solarFlares?.count || 0}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">Last 30 days</p>
                 </CardContent>
@@ -164,7 +177,7 @@ const SpaceWeather = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-accent">
-                    {data?.cme?.length || 0}
+                    {data?.coronalMassEjections?.count || 0}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">Last 30 days</p>
                 </CardContent>
@@ -179,7 +192,7 @@ const SpaceWeather = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-primary-glow">
-                    {data?.geomagneticStorms?.length || 0}
+                    {data?.geomagneticStorms?.count || 0}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">Last 30 days</p>
                 </CardContent>
@@ -194,7 +207,7 @@ const SpaceWeather = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-destructive">
-                    {data?.notifications?.length || 0}
+                    {data?.notifications?.count || 0}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">Last 30 days</p>
                 </CardContent>
@@ -245,25 +258,25 @@ const SpaceWeather = () => {
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[600px] pr-4">
-                  {data?.solarFlares && data.solarFlares.length > 0 ? (
+                  {data?.solarFlares?.recent && data.solarFlares.recent.length > 0 ? (
                     <div className="space-y-3">
-                      {data.solarFlares.map((flare) => {
-                        const flareInfo = getFlareClass(flare.classType);
+                      {data.solarFlares.recent.map((flare, index) => {
+                        const flareInfo = getFlareClass(flare.class);
                         return (
-                          <Card key={flare.flrID} className="glass-card hover:bg-primary/5 transition-colors">
+                          <Card key={index} className="glass-card hover:bg-primary/5 transition-colors">
                             <CardContent className="pt-4">
                               <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-2">
                                     <Badge variant={flareInfo.color as any} className="font-mono">
-                                      {flare.classType}
+                                      {flare.class}
                                     </Badge>
                                     <Badge variant="outline">{flareInfo.label}</Badge>
                                   </div>
                                   <div className="text-sm space-y-1">
                                     <p className="text-muted-foreground">
                                       <span className="font-semibold text-foreground">Begin:</span>{" "}
-                                      {new Date(flare.beginTime).toLocaleString()}
+                                      {new Date(flare.date).toLocaleString()}
                                     </p>
                                     <p className="text-muted-foreground">
                                       <span className="font-semibold text-foreground">Peak:</span>{" "}
@@ -307,26 +320,30 @@ const SpaceWeather = () => {
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[600px] pr-4">
-                  {data?.cme && data.cme.length > 0 ? (
+                  {data?.coronalMassEjections?.recent && data.coronalMassEjections.recent.length > 0 ? (
                     <div className="space-y-3">
-                      {data.cme.map((cme) => (
-                        <Card key={cme.activityID} className="glass-card hover:bg-accent/5 transition-colors">
+                      {data.coronalMassEjections.recent.map((cme, index) => (
+                        <Card key={index} className="glass-card hover:bg-accent/5 transition-colors">
                           <CardContent className="pt-4">
                             <div className="space-y-2">
                               <div className="flex items-center gap-2">
                                 <Badge className="bg-gradient-primary">
                                   {cme.speed ? `${cme.speed} km/s` : 'Speed N/A'}
                                 </Badge>
+                                {cme.type && (
+                                  <Badge variant="outline">{cme.type}</Badge>
+                                )}
                               </div>
                               <div className="text-sm space-y-1">
                                 <p className="text-muted-foreground">
                                   <span className="font-semibold text-foreground">Start:</span>{" "}
-                                  {new Date(cme.startTime).toLocaleString()}
+                                  {new Date(cme.date).toLocaleString()}
                                 </p>
-                                <p className="text-muted-foreground">
-                                  <span className="font-semibold text-foreground">Position:</span>{" "}
-                                  Lat {cme.latitude}°, Lon {cme.longitude}°
-                                </p>
+                                {cme.note && (
+                                  <p className="text-muted-foreground text-xs mt-2">
+                                    {cme.note}
+                                  </p>
+                                )}
                               </div>
                             </div>
                           </CardContent>
@@ -357,17 +374,17 @@ const SpaceWeather = () => {
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[600px] pr-4">
-                  {data?.geomagneticStorms && data.geomagneticStorms.length > 0 ? (
+                  {data?.geomagneticStorms?.recent && data.geomagneticStorms.recent.length > 0 ? (
                     <div className="space-y-3">
-                      {data.geomagneticStorms.map((storm) => (
-                        <Card key={storm.gstID} className="glass-card hover:bg-primary-glow/5 transition-colors">
+                      {data.geomagneticStorms.recent.map((storm, index) => (
+                        <Card key={index} className="glass-card hover:bg-primary-glow/5 transition-colors">
                           <CardContent className="pt-4">
                             <div className="space-y-2">
                               <div className="flex items-center gap-2">
-                                <Badge variant={storm.kpIndex >= 5 ? "destructive" : "default"}>
-                                  Kp Index: {storm.kpIndex}
+                                <Badge variant={storm.kpIndex && storm.kpIndex >= 5 ? "destructive" : "default"}>
+                                  Kp Index: {storm.kpIndex || 'N/A'}
                                 </Badge>
-                                {storm.kpIndex >= 5 && (
+                                {storm.kpIndex && storm.kpIndex >= 5 && (
                                   <Badge variant="outline" className="border-destructive text-destructive">
                                     Strong Storm
                                   </Badge>
@@ -375,8 +392,13 @@ const SpaceWeather = () => {
                               </div>
                               <p className="text-sm text-muted-foreground">
                                 <span className="font-semibold text-foreground">Start:</span>{" "}
-                                {new Date(storm.startTime).toLocaleString()}
+                                {new Date(storm.date).toLocaleString()}
                               </p>
+                              {storm.linkedEvents && storm.linkedEvents.length > 0 && (
+                                <p className="text-xs text-muted-foreground">
+                                  Linked events: {storm.linkedEvents.length}
+                                </p>
+                              )}
                             </div>
                           </CardContent>
                         </Card>
