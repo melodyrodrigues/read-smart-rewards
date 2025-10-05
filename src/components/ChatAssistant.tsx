@@ -132,7 +132,7 @@ const ChatAssistant = ({ bookContext }: ChatAssistantProps) => {
       <div className="p-4 border-b bg-gradient-primary">
         <h2 className="text-lg font-semibold text-white flex items-center gap-2">
           <Bot className="w-5 h-5" />
-          Reading Assistant
+          Assistant Aurora
         </h2>
         {bookContext && (
           <p className="text-xs text-white/80 mt-1">{bookContext}</p>
@@ -144,7 +144,7 @@ const ChatAssistant = ({ bookContext }: ChatAssistantProps) => {
           {messages.length === 0 && (
             <div className="text-center text-muted-foreground py-8">
               <Bot className="w-12 h-12 mx-auto mb-4 text-primary" />
-              <p>Hello! I'm here to help with your reading questions.</p>
+              <p>Hello! I'm Aurora, your cosmic reading assistant.</p>
               <p className="text-sm mt-2">Ask a question to get started!</p>
             </div>
           )}
