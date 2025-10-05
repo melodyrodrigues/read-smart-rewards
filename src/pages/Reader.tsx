@@ -54,7 +54,7 @@ const Reader = () => {
       }
     } catch (error: any) {
       toast({
-        title: "Erro ao carregar livro",
+        title: "Error loading book",
         description: error.message,
         variant: "destructive",
       });
@@ -117,7 +117,7 @@ const Reader = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-glow-pulse">Carregando...</div>
+        <div className="animate-glow-pulse">Loading...</div>
       </div>
     );
   }
@@ -140,18 +140,18 @@ const Reader = () => {
               className="gap-2 hover:bg-primary/10 transition-all"
             >
               <ArrowLeft className="w-4 h-4" />
-              Voltar
+              Back
             </Button>
 
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" className="gap-2 glass-card border-primary/20 hover:bg-primary/10">
                   <MessageSquare className="w-4 h-4" />
-                  Assistente
+                  Assistant
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-full sm:max-w-lg glass-card">
-                <ChatAssistant bookContext={`${book.title}${book.author ? ` - ${book.author}` : ''} (pág. ${currentPage}/${book.total_pages})`} />
+                <ChatAssistant bookContext={`${book.title}${book.author ? ` - ${book.author}` : ''} (page ${currentPage}/${book.total_pages})`} />
               </SheetContent>
             </Sheet>
           </div>
@@ -166,7 +166,7 @@ const Reader = () => {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span>Progresso: {pagesRead} de {book.total_pages} páginas</span>
+                <span>Progress: {pagesRead} of {book.total_pages} pages</span>
                 <span className="font-semibold text-primary">{progressPercent.toFixed(0)}%</span>
               </div>
               <Progress value={progressPercent} className="h-2" />
@@ -199,7 +199,7 @@ const Reader = () => {
             </Button>
 
             <form onSubmit={handlePageInputChange} className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Página</span>
+              <span className="text-sm text-muted-foreground">Page</span>
               <Input
                 type="number"
                 value={pageInput}
@@ -209,7 +209,7 @@ const Reader = () => {
                 max={book.total_pages}
               />
               <span className="text-sm text-muted-foreground">
-                de {book.total_pages}
+                of {book.total_pages}
               </span>
             </form>
 

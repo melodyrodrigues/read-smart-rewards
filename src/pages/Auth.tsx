@@ -34,7 +34,7 @@ const Auth = () => {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        toast({ title: "Login realizado com sucesso!" });
+        toast({ title: "Successfully signed in!" });
         navigate("/");
       } else {
         const { error } = await supabase.auth.signUp({
@@ -44,14 +44,14 @@ const Auth = () => {
         });
         if (error) throw error;
         toast({ 
-          title: "Conta criada!", 
-          description: "Você já pode fazer login." 
+          title: "Account created!", 
+          description: "You can now sign in." 
         });
         setIsLogin(true);
       }
     } catch (error: any) {
       toast({
-        title: "Erro",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -74,7 +74,7 @@ const Auth = () => {
           Cosmo Reader
         </h1>
         <p className="text-center text-muted-foreground mb-8">
-          {isLogin ? "Entre na sua conta" : "Crie sua conta"}
+          {isLogin ? "Sign in to your account" : "Create your account"}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -91,7 +91,7 @@ const Auth = () => {
           </div>
 
           <div>
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="password">Password</Label>
             <Input
               id="password"
               type="password"
@@ -108,7 +108,7 @@ const Auth = () => {
             className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
             disabled={loading}
           >
-            {loading ? "Carregando..." : isLogin ? "Entrar" : "Criar Conta"}
+            {loading ? "Loading..." : isLogin ? "Sign In" : "Create Account"}
           </Button>
         </form>
 
@@ -117,7 +117,7 @@ const Auth = () => {
             onClick={() => setIsLogin(!isLogin)}
             className="text-sm text-primary hover:underline"
           >
-            {isLogin ? "Não tem conta? Criar uma" : "Já tem conta? Entrar"}
+            {isLogin ? "Don't have an account? Create one" : "Already have an account? Sign in"}
           </button>
         </div>
       </Card>

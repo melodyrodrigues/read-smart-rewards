@@ -26,7 +26,7 @@ const UploadBook = ({ onUploadComplete }: UploadBookProps) => {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Usuário não autenticado");
+      if (!user) throw new Error("User not authenticated");
 
       // Upload file to storage
       const fileExt = file.name.split(".").pop();
@@ -55,7 +55,7 @@ const UploadBook = ({ onUploadComplete }: UploadBookProps) => {
 
       if (insertError) throw insertError;
 
-      toast({ title: "Livro adicionado com sucesso!" });
+      toast({ title: "Book added successfully!" });
       setTitle("");
       setAuthor("");
       setFile(null);
@@ -63,7 +63,7 @@ const UploadBook = ({ onUploadComplete }: UploadBookProps) => {
       onUploadComplete();
     } catch (error: any) {
       toast({
-        title: "Erro ao adicionar livro",
+        title: "Error adding book",
         description: error.message,
         variant: "destructive",
       });
@@ -75,12 +75,12 @@ const UploadBook = ({ onUploadComplete }: UploadBookProps) => {
   return (
     <Card className="p-6 shadow-card">
       <h2 className="text-2xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
-        Adicionar Novo Livro
+        Add New Book
       </h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="title">Título *</Label>
+          <Label htmlFor="title">Title *</Label>
           <Input
             id="title"
             value={title}
@@ -91,7 +91,7 @@ const UploadBook = ({ onUploadComplete }: UploadBookProps) => {
         </div>
 
         <div>
-          <Label htmlFor="author">Autor</Label>
+          <Label htmlFor="author">Author</Label>
           <Input
             id="author"
             value={author}
@@ -101,7 +101,7 @@ const UploadBook = ({ onUploadComplete }: UploadBookProps) => {
         </div>
 
         <div>
-          <Label htmlFor="pages">Número de Páginas</Label>
+          <Label htmlFor="pages">Number of Pages</Label>
           <Input
             id="pages"
             type="number"
@@ -112,7 +112,7 @@ const UploadBook = ({ onUploadComplete }: UploadBookProps) => {
         </div>
 
         <div>
-          <Label htmlFor="file">Arquivo (PDF) *</Label>
+          <Label htmlFor="file">File (PDF) *</Label>
           <Input
             id="file"
             type="file"
@@ -131,12 +131,12 @@ const UploadBook = ({ onUploadComplete }: UploadBookProps) => {
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Enviando...
+              Uploading...
             </>
           ) : (
             <>
               <Upload className="mr-2 h-4 w-4" />
-              Adicionar Livro
+              Add Book
             </>
           )}
         </Button>

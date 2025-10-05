@@ -59,7 +59,7 @@ const Index = () => {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    toast({ title: "Logout realizado com sucesso!" });
+    toast({ title: "Successfully signed out!" });
     navigate("/auth");
   };
 
@@ -67,10 +67,10 @@ const Index = () => {
     try {
       const { error } = await supabase.from("books").delete().eq("id", bookId);
       if (error) throw error;
-      toast({ title: "Livro removido!" });
+      toast({ title: "Book removed!" });
       loadData();
     } catch (error: any) {
-      toast({ title: "Erro ao remover livro", description: error.message, variant: "destructive" });
+      toast({ title: "Error removing book", description: error.message, variant: "destructive" });
     }
   };
 
@@ -103,7 +103,7 @@ const Index = () => {
             Cosmo Reader
           </h1>
           <p className="text-xl text-foreground/80 mb-6 animate-fade-in">
-            Navegue pelo universo do conhecimento com dados espaciais em tempo real
+            Navigate the universe of knowledge with real-time space data
           </p>
           <Button 
             onClick={handleSignOut}
@@ -111,7 +111,7 @@ const Index = () => {
             className="animate-scale-in"
           >
             <LogOut className="mr-2 h-4 w-4" />
-            Sair
+            Sign Out
           </Button>
         </div>
       </div>
@@ -122,15 +122,15 @@ const Index = () => {
           <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="library" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
-              Biblioteca
+              Library
             </TabsTrigger>
             <TabsTrigger value="assistant" className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
-              Assistente
+              Assistant
             </TabsTrigger>
             <TabsTrigger value="achievements" className="flex items-center gap-2">
               <Trophy className="w-4 h-4" />
-              Conquistas
+              Achievements
             </TabsTrigger>
           </TabsList>
 
@@ -139,7 +139,7 @@ const Index = () => {
             
             {books.length > 0 ? (
               <div>
-                <h2 className="text-2xl font-bold mb-4">Meus Livros</h2>
+                <h2 className="text-2xl font-bold mb-4">My Books</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {books.map((book) => (
                     <BookCard
@@ -155,7 +155,7 @@ const Index = () => {
             ) : (
               <div className="text-center py-12 text-muted-foreground">
                 <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p>Nenhum livro adicionado ainda. Comece fazendo upload acima!</p>
+                <p>No books added yet. Start by uploading one above!</p>
               </div>
             )}
           </TabsContent>
@@ -169,23 +169,23 @@ const Index = () => {
           <TabsContent value="achievements">
             <div className="max-w-4xl mx-auto">
               <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-primary bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(168,85,247,0.4)]">
-                🌟 Conquistas Estelares
+                🌟 Stellar Achievements
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <AchievementBadge
                   type="reader"
                   earned={books.length >= 1}
-                  description="Adicione seu primeiro livro"
+                  description="Add your first book"
                 />
                 <AchievementBadge
                   type="scholar"
                   earned={books.length >= 5}
-                  description="Adicione 5 livros à biblioteca"
+                  description="Add 5 books to the library"
                 />
                 <AchievementBadge
                   type="master"
                   earned={books.length >= 10}
-                  description="Adicione 10 livros à biblioteca"
+                  description="Add 10 books to the library"
                 />
               </div>
             </div>

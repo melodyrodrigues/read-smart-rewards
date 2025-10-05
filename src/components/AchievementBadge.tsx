@@ -12,19 +12,19 @@ interface AchievementBadgeProps {
 const BADGE_MAP = {
   reader: { 
     img: badgeReader, 
-    title: "Leitor Iniciante", 
+    title: "Earth Observer", 
     gradient: "bg-gradient-to-br from-yellow-400 via-orange-400 to-orange-500",
     glow: "shadow-[0_0_30px_hsl(35_100%_55%/0.5)]"
   },
   scholar: { 
     img: badgeScholar, 
-    title: "Estudioso", 
+    title: "NASA Astronaut", 
     gradient: "bg-gradient-to-br from-slate-400 via-slate-500 to-slate-600",
     glow: "shadow-[0_0_30px_hsl(210_15%_50%/0.5)]"
   },
   master: { 
     img: badgeMaster, 
-    title: "Mestre da Leitura", 
+    title: "Master of the Universe", 
     gradient: "bg-gradient-to-br from-purple-500 via-violet-500 to-fuchsia-500",
     glow: "shadow-[0_0_40px_hsl(280_85%_60%/0.6)]"
   },
@@ -59,7 +59,7 @@ const AchievementBadge = ({ type, earned = false, description }: AchievementBadg
       <p className="text-sm text-muted-foreground">{description}</p>
       {earned && (
         <div className="mt-3 text-xs font-semibold text-primary animate-fade-in">
-          ✨ Conquista Desbloqueada!
+          ✨ Achievement Unlocked!
         </div>
       )}
     </Card>

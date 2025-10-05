@@ -39,7 +39,7 @@ const ChatAssistant = ({ bookContext }: ChatAssistantProps) => {
           setSpaceWeatherData(data);
         }
       } catch (error) {
-        console.error("Erro ao buscar dados de clima espacial:", error);
+        console.error("Error fetching space weather data:", error);
       }
     };
     fetchSpaceWeather();
@@ -77,7 +77,7 @@ const ChatAssistant = ({ bookContext }: ChatAssistantProps) => {
       );
 
       if (!response.ok || !response.body) {
-        throw new Error("Erro ao conectar com assistente");
+        throw new Error("Failed to connect to assistant");
       }
 
       const reader = response.body.getReader();
@@ -117,7 +117,7 @@ const ChatAssistant = ({ bookContext }: ChatAssistantProps) => {
       }
     } catch (error: any) {
       toast({
-        title: "Erro",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -132,7 +132,7 @@ const ChatAssistant = ({ bookContext }: ChatAssistantProps) => {
       <div className="p-4 border-b bg-gradient-primary">
         <h2 className="text-lg font-semibold text-white flex items-center gap-2">
           <Bot className="w-5 h-5" />
-          Assistente de Leitura
+          Reading Assistant
         </h2>
         {bookContext && (
           <p className="text-xs text-white/80 mt-1">{bookContext}</p>
@@ -144,8 +144,8 @@ const ChatAssistant = ({ bookContext }: ChatAssistantProps) => {
           {messages.length === 0 && (
             <div className="text-center text-muted-foreground py-8">
               <Bot className="w-12 h-12 mx-auto mb-4 text-primary" />
-              <p>Olá! Estou aqui para ajudar com suas dúvidas sobre leitura.</p>
-              <p className="text-sm mt-2">Faça uma pergunta para começar!</p>
+              <p>Hello! I'm here to help with your reading questions.</p>
+              <p className="text-sm mt-2">Ask a question to get started!</p>
             </div>
           )}
           
@@ -189,7 +189,7 @@ const ChatAssistant = ({ bookContext }: ChatAssistantProps) => {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Digite sua pergunta..."
+            placeholder="Type your question..."
             disabled={isLoading}
           />
           <Button

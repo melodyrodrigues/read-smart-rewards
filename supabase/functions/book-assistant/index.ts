@@ -19,19 +19,19 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
     
-    let systemPrompt = 'Você é um assistente inteligente especializado em clima espacial e leitura. ';
+    let systemPrompt = 'You are an intelligent assistant specialized in space weather and reading. ';
     
     if (bookContext) {
-      systemPrompt += `Ajude o usuário a entender o conteúdo do livro que ele está lendo. Contexto do livro: ${bookContext}. `;
+      systemPrompt += `Help the user understand the content of the book they are reading. Book context: ${bookContext}. `;
     } else {
-      systemPrompt += 'Ajude o usuário com dúvidas sobre livros, técnicas de leitura e compreensão de textos. ';
+      systemPrompt += 'Help the user with questions about books, reading techniques, and text comprehension. ';
     }
     
     if (spaceWeatherContext) {
-      systemPrompt += `\n\nVocê também tem acesso a dados em tempo real sobre clima espacial da NASA:\n${JSON.stringify(spaceWeatherContext, null, 2)}\n\nUse esses dados quando o usuário perguntar sobre clima espacial, atividade solar, tempestades geomagnéticas, ou fenômenos espaciais. Explique de forma didática e acessível.`;
+      systemPrompt += `\n\nYou also have access to real-time space weather data from NASA:\n${JSON.stringify(spaceWeatherContext, null, 2)}\n\nUse this data when the user asks about space weather, solar activity, geomagnetic storms, solar wind notifications, or space phenomena. Explain in a didactic and accessible way.`;
     }
     
-    systemPrompt += '\n\nSeja conciso e didático em todas as respostas.';
+    systemPrompt += '\n\nBe concise and didactic in all responses.';
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -51,20 +51,20 @@ serve(async (req) => {
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Muitas requisições. Tente novamente em instantes." }), {
+        return new Response(JSON.stringify({ error: "Too many requests. Please try again shortly." }), {
           status: 429,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Créditos insuficientes." }), {
+        return new Response(JSON.stringify({ error: "Insufficient credits." }), {
           status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
-      return new Response(JSON.stringify({ error: "Erro ao conectar com IA" }), {
+      return new Response(JSON.stringify({ error: "Error connecting to AI" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

@@ -64,7 +64,7 @@ const BookCard = ({ book, progress, onDelete, onClick }: BookCardProps) => {
           <div className="space-y-2">
             <Progress value={progressPercent} className="h-2" />
             <p className="text-xs text-muted-foreground">
-              {progress.pages_read} de {book.total_pages} páginas
+              {progress.pages_read} of {book.total_pages} pages
             </p>
           </div>
         )}
