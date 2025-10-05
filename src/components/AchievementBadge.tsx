@@ -12,19 +12,19 @@ interface AchievementBadgeProps {
 const BADGE_MAP = {
   reader: { 
     img: badgeReader, 
-    title: "Earth Observer", 
+    title: "MISSION APOLLO 1", 
     gradient: "bg-gradient-to-br from-yellow-400 via-orange-400 to-orange-500",
     glow: "shadow-[0_0_30px_hsl(35_100%_55%/0.5)]"
   },
   scholar: { 
     img: badgeScholar, 
-    title: "NASA Astronaut", 
+    title: "MISSION APOLLO 2", 
     gradient: "bg-gradient-to-br from-slate-400 via-slate-500 to-slate-600",
     glow: "shadow-[0_0_30px_hsl(210_15%_50%/0.5)]"
   },
   master: { 
     img: badgeMaster, 
-    title: "Master of the Universe", 
+    title: "MISSION APOLLO 3", 
     gradient: "bg-gradient-to-br from-purple-500 via-violet-500 to-fuchsia-500",
     glow: "shadow-[0_0_40px_hsl(280_85%_60%/0.6)]"
   },
