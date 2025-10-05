@@ -36,6 +36,35 @@ export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
     try {
       // Analyze all books
       const allKeywords: KeywordWithInfo[] = [];
+      let usedFallback = false;
+
+      const extractFallback = (text: string, limit = 12): KeywordWithInfo[] => {
+        if (!text) return [];
+        const cleaned = text
+          .toLowerCase()
+          .replace(/[^a-zà-ú0-9\s-]/gi, ' ')
+          .replace(/\s+/g, ' ');
+        const stop = new Set([
+          'the','and','of','to','a','in','is','it','that','as','for','on','with','this','by','an','be','or','from','at','are','was','were','um','uma','de','da','do','das','dos','e','o','a','os','as','que','por','com','para','em','se','no','na','nos','nas'
+        ]);
+        const counts: Record<string, number> = {};
+        for (const w of cleaned.split(' ')) {
+          if (!w || w.length < 4 || stop.has(w)) continue;
+          counts[w] = (counts[w] || 0) + 1;
+        }
+        return Object.entries(counts)
+          .sort((a,b) => b[1]-a[1])
+          .slice(0, limit)
+          .map(([w]) => ({
+            keyword: w,
+            definition: `Topic related to "${w}" found in your book content`,
+            category: 'General',
+            example: undefined,
+            relatedTerms: [],
+            hasNasaInfo: false,
+            nasaData: null
+          }));
+      };
       
       for (const book of books) {
         const { data, error } = await supabase.functions.invoke('analyze-book-keywords', {
@@ -46,13 +75,25 @@ export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
           }
         });
 
-        if (error) {
-          console.error('Error analyzing book:', error);
+        if (error || !data?.success) {
+          console.error('Error analyzing book:', error || data);
+          // Fallback: local extraction to keep the feature working
+          const fallback = extractFallback(book.content || '', 8);
+          if (fallback.length) {
+            allKeywords.push(...fallback);
+            usedFallback = true;
+          }
           continue;
         }
 
-        if (data?.success && data?.keywords) {
+        if (data?.keywords?.length) {
           allKeywords.push(...data.keywords);
+        } else {
+          const fallback = extractFallback(book.content || '', 8);
+          if (fallback.length) {
+            allKeywords.push(...fallback);
+            usedFallback = true;
+          }
         }
       }
 
@@ -64,16 +105,21 @@ export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
       setExtractedKeywords(uniqueKeywords);
       
       toast({
-        title: "Keywords analyzed!",
-        description: `Found ${uniqueKeywords.length} keywords using AI.`,
+        title: usedFallback ? 'Keywords (modo básico)' : 'Keywords analisadas!',
+        description: usedFallback
+          ? `Encontramos ${uniqueKeywords.length} palavras-chave usando um método local devido à alta demanda da IA.`
+          : `Encontramos ${uniqueKeywords.length} palavras-chave com IA.`,
       });
     } catch (error) {
       console.error('Error analyzing books:', error);
       toast({
-        title: "Error analyzing keywords",
-        description: "Please try again later.",
-        variant: "destructive"
+        title: 'Erro ao analisar keywords',
+        description: 'Tentando método local...'
       });
+      // Last resort: merge fallbacks from all books
+      const fallbacks = books.map(b => (b?.content ? String(b.content) : '')).join(' ');
+      const basic = extractFallback(fallbacks, 15);
+      setExtractedKeywords(basic);
     } finally {
       setLoading(false);
     }
