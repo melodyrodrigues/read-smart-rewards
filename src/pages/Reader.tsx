@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -22,6 +23,7 @@ const Reader = () => {
   const [pagesRead, setPagesRead] = useState(0);
   const [loading, setLoading] = useState(true);
   const [viewUrl, setViewUrl] = useState<string | null>(null);
+  const [textPages, setTextPages] = useState<string[]>([]);
 
   useEffect(() => {
     if (!bookId) {
@@ -75,7 +77,13 @@ const Reader = () => {
         setPagesRead(progressData.pages_read || 0);
       }
 
-      // Generate a signed URL for private buckets or fallback to stored URL
+      // Handle text books
+      if (bookData.book_type === 'text' && bookData.content) {
+        const pages = splitTextIntoPages(bookData.content);
+        setTextPages(pages);
+      }
+
+      // Generate a signed URL for PDF books
       let urlForView: string | null = null;
       let storagePath: string | null = null;
 
@@ -110,7 +118,9 @@ const Reader = () => {
         urlForView = bookData.file_url;
       }
 
-      setViewUrl(urlForView);
+      if (bookData.book_type === 'pdf') {
+        setViewUrl(urlForView);
+      }
 
     } catch (error: any) {
       toast({
@@ -160,9 +170,23 @@ const Reader = () => {
   };
 
   const handlePageChange = (newPage: number) => {
-    if (!book || newPage < 1 || newPage > book.total_pages) return;
+    if (!book) return;
+    const maxPages = book.book_type === 'text' ? textPages.length : book.total_pages;
+    if (newPage < 1 || newPage > maxPages) return;
     setCurrentPage(newPage);
     updateProgress(newPage);
+  };
+
+  const splitTextIntoPages = (text: string): string[] => {
+    const wordsPerPage = 300;
+    const words = text.split(/\s+/);
+    const pages: string[] = [];
+    
+    for (let i = 0; i < words.length; i += wordsPerPage) {
+      pages.push(words.slice(i, i + wordsPerPage).join(' '));
+    }
+    
+    return pages.length > 0 ? pages : [text];
   };
 
   if (loading) {
@@ -175,8 +199,9 @@ const Reader = () => {
 
   if (!book) return null;
 
-  const progressPercent = book.total_pages > 0 
-    ? (pagesRead / book.total_pages) * 100 
+  const totalPages = book.book_type === 'text' ? textPages.length : book.total_pages;
+  const progressPercent = totalPages > 0 
+    ? (pagesRead / totalPages) * 100 
     : 0;
 
   return (
@@ -207,7 +232,7 @@ const Reader = () => {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-full sm:max-w-lg glass-card">
-                  <ChatAssistant bookContext={`${book.title}${book.author ? ` - ${book.author}` : ''} (page ${currentPage}/${book.total_pages})`} />
+                  <ChatAssistant bookContext={`${book.title}${book.author ? ` - ${book.author}` : ''} (page ${currentPage}/${totalPages})`} />
                 </SheetContent>
               </Sheet>
             </div>
@@ -223,7 +248,7 @@ const Reader = () => {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span>Progress: {pagesRead} of {book.total_pages} pages</span>
+                <span>Progress: {pagesRead} of {totalPages} pages</span>
                 <span className="font-semibold text-primary">{progressPercent.toFixed(0)}%</span>
               </div>
               <Progress value={progressPercent} className="h-2" />
@@ -232,9 +257,44 @@ const Reader = () => {
         </div>
       </div>
 
-      {/* PDF Viewer */}
+      {/* Content Viewer */}
       <div className="container mx-auto px-4 py-6">
-        {viewUrl ? (
+        {book.book_type === 'text' ? (
+          <div className="space-y-4">
+            <Card className="glass-card p-4">
+              <div className="flex items-center justify-between gap-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage <= 1}
+                  className="hover:bg-primary hover:text-primary-foreground transition-all"
+                >
+                  Previous
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  Page {currentPage} of {textPages.length}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage >= textPages.length}
+                  className="hover:bg-primary hover:text-primary-foreground transition-all"
+                >
+                  Next
+                </Button>
+              </div>
+            </Card>
+            <Card className="glass-card p-8">
+              <div className="prose prose-invert max-w-none">
+                <p className="text-foreground leading-relaxed whitespace-pre-wrap">
+                  {textPages[currentPage - 1]}
+                </p>
+              </div>
+            </Card>
+          </div>
+        ) : viewUrl ? (
           <PDFViewer
             fileUrl={viewUrl}
             currentPage={currentPage}

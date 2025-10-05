@@ -17,9 +17,11 @@ export type Database = {
       books: {
         Row: {
           author: string | null
+          book_type: string
+          content: string | null
           cover_url: string | null
           created_at: string
-          file_url: string
+          file_url: string | null
           id: string
           title: string
           total_pages: number | null
@@ -28,9 +30,11 @@ export type Database = {
         }
         Insert: {
           author?: string | null
+          book_type?: string
+          content?: string | null
           cover_url?: string | null
           created_at?: string
-          file_url: string
+          file_url?: string | null
           id?: string
           title: string
           total_pages?: number | null
@@ -39,9 +43,11 @@ export type Database = {
         }
         Update: {
           author?: string | null
+          book_type?: string
+          content?: string | null
           cover_url?: string | null
           created_at?: string
-          file_url?: string
+          file_url?: string | null
           id?: string
           title?: string
           total_pages?: number | null
