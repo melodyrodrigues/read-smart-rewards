@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Sun, Zap, Radio, AlertTriangle, RefreshCw } from "lucide-react";
+import { ArrowLeft, Sun, Zap, Radio, AlertTriangle, RefreshCw, TrendingUp, ExternalLink, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { GlossaryPopover } from "@/components/GlossaryPopover";
 
@@ -52,11 +52,21 @@ interface SpaceWeatherData {
   };
 }
 
+interface TrendingTopic {
+  title: string;
+  description: string;
+  category: "solar" | "magnetosphere" | "radiation" | "aurora" | "cosmic";
+  relevance: number;
+  nasaUrl: string;
+}
+
 const SpaceWeather = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [data, setData] = useState<SpaceWeatherData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [trendingTopics, setTrendingTopics] = useState<TrendingTopic[]>([]);
+  const [loadingTrending, setLoadingTrending] = useState(false);
 
   const loadSpaceWeatherData = async () => {
     setLoading(true);
@@ -80,9 +90,62 @@ const SpaceWeather = () => {
     }
   };
 
+  const loadTrendingTopics = async () => {
+    if (!data) return;
+    
+    setLoadingTrending(true);
+    try {
+      const { data: functionData, error: functionError } = await supabase.functions.invoke(
+        'analyze-trending-topics',
+        {
+          body: { spaceWeatherData: data }
+        }
+      );
+
+      if (functionError) throw functionError;
+
+      setTrendingTopics(functionData.topics || []);
+      toast({
+        title: "Tópicos atualizados!",
+        description: "IA analisou os dados mais recentes da NASA",
+      });
+    } catch (error: any) {
+      console.error('Error loading trending topics:', error);
+      toast({
+        title: "Erro ao carregar tópicos",
+        description: error.message || "Falha ao analisar dados com IA",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingTrending(false);
+    }
+  };
+
   useEffect(() => {
     loadSpaceWeatherData();
   }, []);
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'solar': return <Sun className="w-5 h-5" />;
+      case 'magnetosphere': return <Radio className="w-5 h-5" />;
+      case 'radiation': return <Zap className="w-5 h-5" />;
+      case 'aurora': return <Sparkles className="w-5 h-5" />;
+      case 'cosmic': return <TrendingUp className="w-5 h-5" />;
+      default: return <Sun className="w-5 h-5" />;
+    }
+  };
+
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'solar': return 'text-primary';
+      case 'magnetosphere': return 'text-accent';
+      case 'radiation': return 'text-destructive';
+      case 'aurora': return 'text-primary-glow';
+      case 'cosmic': return 'text-purple-400';
+      default: return 'text-primary';
+    }
+  };
 
   const getFlareClass = (classType: string) => {
     const firstChar = classType.charAt(0);
@@ -143,8 +206,12 @@ const SpaceWeather = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="glass-card grid w-full grid-cols-4 lg:w-auto">
+          <TabsList className="glass-card grid w-full grid-cols-5 lg:w-auto">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="trending">
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Em Alta
+            </TabsTrigger>
             <TabsTrigger value="flares">Solar Flares</TabsTrigger>
             <TabsTrigger value="cme">CME</TabsTrigger>
             <TabsTrigger value="storms">Geomagnetic</TabsTrigger>
@@ -242,6 +309,152 @@ const SpaceWeather = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Trending Topics Tab */}
+          <TabsContent value="trending">
+            <Card className="glass-card border-primary/20 mb-6">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-primary" />
+                      Tópicos em Alta sobre Clima Espacial
+                    </CardTitle>
+                    <CardDescription>
+                      Análise por IA dos dados mais recentes da NASA DONKI
+                    </CardDescription>
+                  </div>
+                  <Button
+                    onClick={loadTrendingTopics}
+                    disabled={loadingTrending}
+                    className="bg-gradient-primary hover:opacity-90"
+                  >
+                    {loadingTrending ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Analisando...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Gerar Tópicos com IA
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </CardHeader>
+            </Card>
+
+            {trendingTopics.length === 0 ? (
+              <Card className="glass-card border-primary/20">
+                <CardContent className="py-12">
+                  <div className="text-center space-y-4">
+                    <Sparkles className="w-16 h-16 mx-auto text-primary/50" />
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Descubra os Tópicos em Alta</h3>
+                      <p className="text-muted-foreground max-w-md mx-auto">
+                        Clique no botão "Gerar Tópicos com IA" para descobrir os assuntos mais relevantes
+                        sobre clima espacial baseados nos dados mais recentes da NASA
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {trendingTopics
+                  .sort((a, b) => b.relevance - a.relevance)
+                  .map((topic, index) => (
+                    <Card 
+                      key={index} 
+                      className="glass-card border-primary/20 hover:border-primary/40 transition-all hover:scale-105 cursor-pointer group"
+                    >
+                      <CardHeader>
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className={`p-2 rounded-lg bg-background/50 ${getCategoryColor(topic.category)}`}>
+                            {getCategoryIcon(topic.category)}
+                          </div>
+                          <Badge 
+                            variant="outline" 
+                            className="border-primary/30 bg-gradient-primary text-white"
+                          >
+                            {topic.relevance}% relevante
+                          </Badge>
+                        </div>
+                        <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                          {topic.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {topic.description}
+                        </p>
+                        
+                        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                          <Badge variant="secondary" className="capitalize">
+                            {topic.category}
+                          </Badge>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(topic.nasaUrl, '_blank')}
+                            className="gap-2 hover:text-primary"
+                          >
+                            NASA
+                            <ExternalLink className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+              </div>
+            )}
+
+            {/* Additional NASA Resources */}
+            {trendingTopics.length > 0 && (
+              <Card className="glass-card border-primary/20 mt-6">
+                <CardHeader>
+                  <CardTitle className="text-lg">Recursos Adicionais da NASA</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Button
+                      variant="outline"
+                      className="justify-start gap-2"
+                      onClick={() => window.open('https://www.nasa.gov/mission_pages/sunearth/spaceweather/index.html', '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      NASA Space Weather
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="justify-start gap-2"
+                      onClick={() => window.open('https://science.nasa.gov/heliophysics/', '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Heliophysics
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="justify-start gap-2"
+                      onClick={() => window.open('https://www.swpc.noaa.gov/', '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      NOAA Space Weather
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="justify-start gap-2"
+                      onClick={() => window.open('https://sdo.gsfc.nasa.gov/', '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Solar Dynamics Observatory
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* Solar Flares Tab */}

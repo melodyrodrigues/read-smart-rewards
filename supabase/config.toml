@@ -4,10 +4,13 @@ project_id = "hywjlflrlkwgysjayozl"
 verify_jwt = true
 
 [functions.nasa-space-weather]
-verify_jwt = true
+verify_jwt = false
 
 [functions.analyze-book-keywords]
 verify_jwt = true
 
 [functions.text-to-speech]
 verify_jwt = true
+
+[functions.analyze-trending-topics]
+verify_jwt = false
