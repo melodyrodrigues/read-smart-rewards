@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Sun, Zap, Radio, AlertTriangle, RefreshCw, TrendingUp, ExternalLink, Sparkles } from "lucide-react";
+import { ArrowLeft, Sun, Zap, Radio, AlertTriangle, RefreshCw, TrendingUp, ExternalLink, Sparkles, Palette, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { GlossaryPopover } from "@/components/GlossaryPopover";
 
@@ -67,6 +67,9 @@ const SpaceWeather = () => {
   const [loading, setLoading] = useState(true);
   const [trendingTopics, setTrendingTopics] = useState<TrendingTopic[]>([]);
   const [loadingTrending, setLoadingTrending] = useState(false);
+  const [coloringPrompt, setColoringPrompt] = useState("");
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [generatingImage, setGeneratingImage] = useState(false);
 
   const loadSpaceWeatherData = async () => {
     setLoading(true);
@@ -119,6 +122,60 @@ const SpaceWeather = () => {
     } finally {
       setLoadingTrending(false);
     }
+  };
+
+  const generateColoringImage = async () => {
+    if (!coloringPrompt.trim()) {
+      toast({
+        title: "Prompt vazio",
+        description: "Por favor, descreva o desenho que deseja criar",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setGeneratingImage(true);
+    try {
+      const { data: functionData, error: functionError } = await supabase.functions.invoke(
+        'generate-coloring-image',
+        {
+          body: { prompt: coloringPrompt }
+        }
+      );
+
+      if (functionError) throw functionError;
+
+      setGeneratedImage(functionData.imageUrl);
+      toast({
+        title: "Desenho criado!",
+        description: "Seu desenho para colorir está pronto",
+      });
+    } catch (error: any) {
+      console.error('Error generating coloring image:', error);
+      toast({
+        title: "Erro ao gerar desenho",
+        description: error.message || "Falha ao criar desenho com IA",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingImage(false);
+    }
+  };
+
+  const downloadImage = () => {
+    if (!generatedImage) return;
+
+    const link = document.createElement('a');
+    link.href = generatedImage;
+    link.download = `desenho-espacial-${Date.now()}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Download iniciado!",
+      description: "Seu desenho está sendo baixado",
+    });
   };
 
   useEffect(() => {
@@ -206,11 +263,15 @@ const SpaceWeather = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="glass-card grid w-full grid-cols-5 lg:w-auto">
+          <TabsList className="glass-card grid w-full grid-cols-6 lg:w-auto">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="trending">
               <TrendingUp className="w-4 h-4 mr-2" />
               Em Alta
+            </TabsTrigger>
+            <TabsTrigger value="coloring">
+              <Palette className="w-4 h-4 mr-2" />
+              Desenhos
             </TabsTrigger>
             <TabsTrigger value="flares">Solar Flares</TabsTrigger>
             <TabsTrigger value="cme">CME</TabsTrigger>
@@ -451,6 +512,149 @@ const SpaceWeather = () => {
                       <ExternalLink className="w-4 h-4" />
                       Solar Dynamics Observatory
                     </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Coloring Images Tab */}
+          <TabsContent value="coloring">
+            <Card className="glass-card border-primary/20 mb-6">
+              <CardHeader>
+                <div className="space-y-4">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Palette className="w-5 h-5 text-primary" />
+                      Gerador de Desenhos para Colorir
+                    </CardTitle>
+                    <CardDescription>
+                      Crie desenhos temáticos sobre espaço para imprimir e colorir usando IA
+                    </CardDescription>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={coloringPrompt}
+                      onChange={(e) => setColoringPrompt(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && generateColoringImage()}
+                      placeholder="Ex: astronauta no espaço, planeta com anéis, foguete..."
+                      className="flex-1 px-4 py-2 rounded-md bg-background border border-border focus:outline-none focus:ring-2 focus:ring-primary"
+                      disabled={generatingImage}
+                    />
+                    <Button
+                      onClick={generateColoringImage}
+                      disabled={generatingImage || !coloringPrompt.trim()}
+                      className="bg-gradient-primary hover:opacity-90"
+                    >
+                      {generatingImage ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                          Gerando...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Gerar Desenho
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+
+            {!generatedImage ? (
+              <Card className="glass-card border-primary/20">
+                <CardContent className="py-16">
+                  <div className="text-center space-y-4">
+                    <Palette className="w-20 h-20 mx-auto text-primary/50" />
+                    <div className="max-w-md mx-auto">
+                      <h3 className="text-xl font-semibold mb-2">Crie Desenhos Personalizados</h3>
+                      <p className="text-muted-foreground">
+                        Digite uma descrição e nossa IA criará um desenho para colorir com tema espacial.
+                        Perfeito para atividades educativas!
+                      </p>
+                      <div className="mt-6 grid grid-cols-2 gap-2 text-sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setColoringPrompt("astronauta flutuando no espaço")}
+                          className="text-xs"
+                        >
+                          🚀 Astronauta
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setColoringPrompt("sistema solar com todos os planetas")}
+                          className="text-xs"
+                        >
+                          🪐 Sistema Solar
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setColoringPrompt("foguete decolando da Terra")}
+                          className="text-xs"
+                        >
+                          🚀 Foguete
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setColoringPrompt("galáxia espiral com estrelas")}
+                          className="text-xs"
+                        >
+                          ⭐ Galáxia
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="glass-card border-primary/20">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Seu Desenho</CardTitle>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={downloadImage}
+                        className="gap-2"
+                      >
+                        <Download className="w-4 h-4" />
+                        Baixar
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setGeneratedImage(null);
+                          setColoringPrompt("");
+                        }}
+                      >
+                        Novo Desenho
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="relative rounded-lg overflow-hidden bg-white p-4">
+                    <img
+                      src={generatedImage}
+                      alt="Desenho para colorir"
+                      className="w-full h-auto rounded-md shadow-lg"
+                    />
+                  </div>
+                  <div className="mt-4 p-4 bg-background/50 rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Dica:</strong> Baixe o desenho e imprima para colorir com lápis de cor, 
+                      canetinhas ou tinta. Você também pode colorir digitalmente usando programas de edição de imagem.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
