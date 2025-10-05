@@ -6,13 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen, Sparkles } from "lucide-react";
+import { BookOpen, Sparkles, Eye, EyeOff } from "lucide-react";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [isResetPassword, setIsResetPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -20,19 +24,64 @@ const Auth = () => {
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+      if (session && !isResetPassword) {
         navigate("/");
       }
     };
     checkSession();
-  }, [navigate]);
+
+    // Listen for password recovery events
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsResetPassword(true);
+        setIsForgotPassword(false);
+        setIsLogin(false);
+        toast({
+          title: "Reset your password",
+          description: "Please enter your new password below.",
+        });
+      } else if (event === 'SIGNED_IN' && session) {
+        if (!isResetPassword) {
+          navigate("/");
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate, isResetPassword]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      if (isForgotPassword) {
+      if (isResetPassword) {
+        // Validate password match
+        if (newPassword !== confirmPassword) {
+          throw new Error("Passwords do not match");
+        }
+        if (newPassword.length < 6) {
+          throw new Error("Password must be at least 6 characters long");
+        }
+
+        const { error } = await supabase.auth.updateUser({ 
+          password: newPassword 
+        });
+        
+        if (error) throw error;
+        
+        toast({ 
+          title: "Password updated successfully!", 
+          description: "You can now sign in with your new password." 
+        });
+        
+        // Reset states and redirect to login
+        setIsResetPassword(false);
+        setIsLogin(true);
+        setNewPassword("");
+        setConfirmPassword("");
+        
+      } else if (isForgotPassword) {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/auth`,
         });
@@ -42,11 +91,14 @@ const Auth = () => {
           description: "Check your email for the reset link." 
         });
         setIsForgotPassword(false);
+        setEmail("");
+        
       } else if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast({ title: "Successfully signed in!" });
         navigate("/");
+        
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -85,7 +137,9 @@ const Auth = () => {
           Cosmo Reader
         </h1>
         <p className="text-center text-muted-foreground mb-8">
-          {isForgotPassword 
+          {isResetPassword
+            ? "Create your new password"
+            : isForgotPassword 
             ? "Reset your password" 
             : isLogin 
             ? "Sign in to your account" 
@@ -93,51 +147,106 @@ const Auth = () => {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="mt-1"
-            />
-          </div>
-
-          {!isForgotPassword && (
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <Label htmlFor="password">Password</Label>
-                {isLogin && (
+          {isResetPassword ? (
+            <>
+              <div>
+                <Label htmlFor="newPassword">New Password</Label>
+                <div className="relative mt-1">
+                  <Input
+                    id="newPassword"
+                    type={showPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    placeholder="Enter new password (min. 6 characters)"
+                  />
                   <button
                     type="button"
-                    onClick={() => setIsForgotPassword(true)}
-                    className="text-xs text-primary hover:underline"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
-                    Forgot password?
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type={showPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  placeholder="Confirm your new password"
+                  className="mt-1"
+                />
+                {confirmPassword && newPassword !== confirmPassword && (
+                  <p className="text-xs text-destructive mt-1">Passwords do not match</p>
                 )}
               </div>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                className="mt-1"
-              />
-            </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="mt-1"
+                />
+              </div>
+
+              {!isForgotPassword && (
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <Label htmlFor="password">Password</Label>
+                    {isLogin && (
+                      <button
+                        type="button"
+                        onClick={() => setIsForgotPassword(true)}
+                        className="text-xs text-primary hover:underline"
+                      >
+                        Forgot password?
+                      </button>
+                    )}
+                  </div>
+                  <div className="relative mt-1">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={6}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           <Button
             type="submit"
             className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
-            disabled={loading}
+            disabled={loading || (isResetPassword && newPassword !== confirmPassword)}
           >
             {loading 
               ? "Loading..." 
+              : isResetPassword
+              ? "Update Password"
               : isForgotPassword 
               ? "Send Reset Link" 
               : isLogin 
@@ -147,11 +256,16 @@ const Auth = () => {
         </form>
 
         <div className="mt-6 text-center space-y-2">
-          {isForgotPassword ? (
+          {isResetPassword ? (
+            <p className="text-xs text-muted-foreground">
+              After updating your password, you'll be able to sign in with your new credentials.
+            </p>
+          ) : isForgotPassword ? (
             <button
               onClick={() => {
                 setIsForgotPassword(false);
                 setIsLogin(true);
+                setEmail("");
               }}
               className="text-sm text-primary hover:underline"
             >
