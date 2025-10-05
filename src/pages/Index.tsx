@@ -27,8 +27,31 @@ const Index = () => {
       setUser(session?.user ?? null);
       if (!session?.user) navigate("/auth");
     });
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    
+    // Subscribe to user_stats changes
+    const statsChannel = supabase
+      .channel('user_stats_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_stats'
+        },
+        (payload) => {
+          console.log('Stats updated:', payload);
+          if (payload.new && user) {
+            setUserStats(payload.new);
+          }
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      subscription.unsubscribe();
+      statsChannel.unsubscribe();
+    };
+  }, [navigate, user]);
 
   const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession();
