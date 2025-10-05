@@ -92,17 +92,24 @@ const Reader = () => {
       }
 
       if (storagePath) {
+        // Try signed URL first
         const { data: signed, error: signErr } = await supabase
           .storage
           .from("books")
           .createSignedUrl(storagePath, 60 * 60); // 1 hour
         if (!signErr && signed?.signedUrl) {
           urlForView = signed.signedUrl;
+        } else {
+          // Fallback to public URL (bucket may be public)
+          const { data: pub } = supabase.storage.from("books").getPublicUrl(storagePath);
+          if (pub?.publicUrl) {
+            urlForView = pub.publicUrl;
+          }
         }
       }
 
-      // Fallback to raw URL if signing was not possible (e.g., bucket public)
-      if (!urlForView && typeof bookData.file_url === "string") {
+      // If the stored value is already a full URL, use it
+      if (!urlForView && typeof bookData.file_url === "string" && bookData.file_url.startsWith("http")) {
         urlForView = bookData.file_url;
       }
 
