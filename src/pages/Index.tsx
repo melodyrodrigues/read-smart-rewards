@@ -201,9 +201,9 @@ const Index = () => {
                 </p>
               </div>
 
-              {/* Mission Badges */}
+              {/* Library Mission Badges */}
               <div>
-                <h3 className="text-xl font-semibold mb-4 text-center">Mission Badges</h3>
+                <h3 className="text-xl font-semibold mb-4 text-center">Library Mission Badges</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <AchievementBadge
                     type="reader"
