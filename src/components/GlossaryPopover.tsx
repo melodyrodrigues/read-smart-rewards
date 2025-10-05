@@ -118,60 +118,6 @@ export const GlossaryPopover = ({ term, children, definition, category, example 
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Track keyword click
-  const trackKeywordClick = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: existingStats } = await supabase
-        .from('user_stats')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (existingStats) {
-        await supabase
-          .from('user_stats')
-          .update({ keyword_clicks: existingStats.keyword_clicks + 1 })
-          .eq('user_id', user.id);
-      } else {
-        await supabase
-          .from('user_stats')
-          .insert({ user_id: user.id, keyword_clicks: 1, audio_plays: 0 });
-      }
-    } catch (error) {
-      console.error('Error tracking keyword click:', error);
-    }
-  };
-
-  // Track audio play
-  const trackAudioPlay = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: existingStats } = await supabase
-        .from('user_stats')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (existingStats) {
-        await supabase
-          .from('user_stats')
-          .update({ audio_plays: existingStats.audio_plays + 1 })
-          .eq('user_id', user.id);
-      } else {
-        await supabase
-          .from('user_stats')
-          .insert({ user_id: user.id, keyword_clicks: 0, audio_plays: 1 });
-      }
-    } catch (error) {
-      console.error('Error tracking audio play:', error);
-    }
-  };
-
   const termKey = term.toLowerCase().replace(/[^a-z]/g, '');
   const predefinedEntry = glossaryTerms[termKey];
   
@@ -192,7 +138,6 @@ export const GlossaryPopover = ({ term, children, definition, category, example 
     if (open) {
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 600);
-      trackKeywordClick(); // Track when keyword is clicked
     } else {
       // Stop audio when closing
       if (audioRef.current) {
@@ -250,7 +195,6 @@ export const GlossaryPopover = ({ term, children, definition, category, example 
         
         audioRef.current.play();
         setIsPlayingAudio(true);
-        trackAudioPlay(); // Track when audio is played
       }
     } catch (error) {
       console.error('Error generating speech:', error);
