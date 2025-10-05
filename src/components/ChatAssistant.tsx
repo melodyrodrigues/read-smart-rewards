@@ -19,8 +19,31 @@ const ChatAssistant = ({ bookContext }: ChatAssistantProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [spaceWeatherData, setSpaceWeatherData] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchSpaceWeather = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/nasa-space-weather`,
+          {
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setSpaceWeatherData(data);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados de clima espacial:", error);
+      }
+    };
+    fetchSpaceWeather();
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -48,6 +71,7 @@ const ChatAssistant = ({ bookContext }: ChatAssistantProps) => {
           body: JSON.stringify({
             messages: [...messages, userMessage],
             bookContext,
+            spaceWeatherContext: spaceWeatherData,
           }),
         }
       );

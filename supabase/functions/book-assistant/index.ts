@@ -12,16 +12,26 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, bookContext } = await req.json();
+    const { messages, bookContext, spaceWeatherContext } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
-
-    const systemPrompt = bookContext 
-      ? `Você é um assistente inteligente de leitura. Ajude o usuário a entender o conteúdo do livro que ele está lendo. Contexto do livro: ${bookContext}. Seja conciso e didático.`
-      : 'Você é um assistente inteligente de leitura. Ajude o usuário com dúvidas sobre livros, técnicas de leitura e compreensão de textos. Seja conciso e didático.';
+    
+    let systemPrompt = 'Você é um assistente inteligente especializado em clima espacial e leitura. ';
+    
+    if (bookContext) {
+      systemPrompt += `Ajude o usuário a entender o conteúdo do livro que ele está lendo. Contexto do livro: ${bookContext}. `;
+    } else {
+      systemPrompt += 'Ajude o usuário com dúvidas sobre livros, técnicas de leitura e compreensão de textos. ';
+    }
+    
+    if (spaceWeatherContext) {
+      systemPrompt += `\n\nVocê também tem acesso a dados em tempo real sobre clima espacial da NASA:\n${JSON.stringify(spaceWeatherContext, null, 2)}\n\nUse esses dados quando o usuário perguntar sobre clima espacial, atividade solar, tempestades geomagnéticas, ou fenômenos espaciais. Explique de forma didática e acessível.`;
+    }
+    
+    systemPrompt += '\n\nSeja conciso e didático em todas as respostas.';
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
