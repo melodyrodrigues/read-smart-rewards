@@ -99,12 +99,9 @@ const Index = () => {
             <BookOpen className="w-12 h-12 text-primary drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
             <Sparkles className="w-8 h-8 text-accent animate-glow-pulse drop-shadow-[0_0_10px_rgba(192,132,252,0.6)]" />
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent animate-fade-in drop-shadow-[0_0_20px_rgba(168,85,247,0.3)]">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent animate-fade-in drop-shadow-[0_0_20px_rgba(168,85,247,0.3)]">
             Cosmo Reader
           </h1>
-          <p className="text-xl text-foreground/80 mb-6 animate-fade-in">
-            Navigate the universe of knowledge with real-time space data
-          </p>
           <div className="flex gap-3">
             <Button 
               onClick={() => navigate("/space-weather")}
