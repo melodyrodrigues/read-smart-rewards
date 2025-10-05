@@ -3,48 +3,22 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GlossaryPopover } from "@/components/GlossaryPopover";
 import { Sparkles, BookOpen } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 interface KeywordsPanelProps {
   books: any[];
 }
 
-// Keywords relacionadas ao clima espacial
-const spaceWeatherKeywords = [
-  "ionosphere",
-  "ionosfera",
-  "aurora",
-  "magnetosphere",
-  "magnetosfera",
-  "radiation",
-  "radiacao",
-  "radiação",
-  "satellite",
-  "satelite",
-  "satélite",
-  "solar",
-  "cosmic",
-  "cosmico",
-  "cósmico",
-  "atmosphere",
-  "atmosfera",
-  "flare",
-  "storm",
-  "tempestade",
-  "geomagnetic",
-  "geomagnetico",
-  "geomagnético",
-  "coronal",
-  "plasma",
-  "wind",
-  "vento",
-  "space",
-  "espacial",
-  "sun",
-  "sol",
-  "earth",
-  "terra",
-];
+// Common words to exclude (stopwords in Portuguese and English)
+const stopWords = new Set([
+  "a", "o", "e", "de", "da", "do", "em", "para", "com", "por", "uma", "um",
+  "os", "as", "dos", "das", "ao", "aos", "à", "às", "no", "na", "nos", "nas",
+  "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "of",
+  "with", "by", "from", "is", "are", "was", "were", "be", "been", "being",
+  "have", "has", "had", "do", "does", "did", "will", "would", "could", "should",
+  "que", "não", "se", "mais", "como", "muito", "sua", "seu", "seus", "suas",
+  "esse", "essa", "isso", "isto", "este", "esta", "aquele", "aquela", "deste",
+  "desta", "neste", "nesta", "pelo", "pela", "pelos", "pelas", "também", "já",
+]);
 
 export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
   const [extractedKeywords, setExtractedKeywords] = useState<string[]>([]);
@@ -54,19 +28,42 @@ export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
   }, [books]);
 
   const extractKeywords = () => {
-    const keywords = new Set<string>();
+    const keywordFrequency = new Map<string, number>();
     
     books.forEach(book => {
-      const textToSearch = `${book.title} ${book.author || ''}`.toLowerCase();
-      
-      spaceWeatherKeywords.forEach(keyword => {
-        if (textToSearch.includes(keyword.toLowerCase())) {
-          keywords.add(keyword);
-        }
+      // Combine title, author, and content for analysis
+      const textToAnalyze = [
+        book.title,
+        book.author || '',
+        book.content || ''
+      ].join(' ');
+
+      // Extract words
+      const words = textToAnalyze
+        .toLowerCase()
+        .replace(/[^\w\sáàâãéèêíïóôõöúçñ]/g, ' ') // Keep accented characters
+        .split(/\s+/)
+        .filter(word => 
+          word.length > 3 && // Minimum length
+          !stopWords.has(word) && // Not a stopword
+          !/^\d+$/.test(word) // Not just numbers
+        );
+
+      // Count frequency
+      words.forEach(word => {
+        const count = keywordFrequency.get(word) || 0;
+        keywordFrequency.set(word, count + 1);
       });
     });
 
-    setExtractedKeywords(Array.from(keywords).sort());
+    // Sort by frequency and take top keywords
+    const sortedKeywords = Array.from(keywordFrequency.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 50) // Top 50 keywords
+      .map(([word]) => word)
+      .sort(); // Alphabetically for display
+
+    setExtractedKeywords(sortedKeywords);
   };
 
   if (books.length === 0) {
@@ -87,11 +84,11 @@ export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
         <div className="flex items-center gap-3 mb-4">
           <Sparkles className="w-6 h-6 text-primary" />
           <h2 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Space Weather Keywords
+            Book Keywords
           </h2>
         </div>
         <p className="text-muted-foreground">
-          Keywords detected in your library related to space weather. Click on any keyword for interactive definitions powered by NASA data.
+          Most frequent keywords extracted from your books. Click on any keyword to see if there's a glossary definition available.
         </p>
       </Card>
 
@@ -117,7 +114,7 @@ export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
       ) : (
         <Card className="p-6">
           <p className="text-center text-muted-foreground">
-            No space weather keywords detected in your library titles yet.
+            No keywords could be extracted from your books yet. Try adding more content.
           </p>
         </Card>
       )}
