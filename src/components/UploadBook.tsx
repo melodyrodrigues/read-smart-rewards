@@ -65,6 +65,11 @@ const UploadBook = ({ onUploadComplete }: UploadBookProps) => {
       setFile(null);
       setTotalPages("");
       onUploadComplete();
+      
+      // Navigate to reader automatically
+      if (inserted?.id) {
+        navigate(`/reader?id=${inserted.id}`);
+      }
     } catch (error: any) {
       toast({
         title: "Error adding book",
