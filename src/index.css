@@ -20,17 +20,17 @@ All colors MUST be HSL.
     /* Cosmic background */
     --cosmos-gradient: linear-gradient(180deg, hsl(250 100% 98%), hsl(260 80% 96%), hsl(270 70% 94%));
 
-    --primary: 270 80% 60%;
+    --primary: 270 60% 50%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 280 90% 70%;
+    --primary-glow: 275 65% 60%;
 
     --secondary: 250 60% 92%;
-    --secondary-foreground: 270 80% 30%;
+    --secondary-foreground: 270 60% 30%;
 
     --muted: 250 40% 95%;
     --muted-foreground: 258 30% 45%;
 
-    --accent: 285 85% 65%;
+    --accent: 190 70% 45%;
     --accent-foreground: 0 0% 100%;
 
     --success: 142 76% 36%;
@@ -45,16 +45,16 @@ All colors MUST be HSL.
 
     --radius: 1rem;
     
-    /* Gradientes Roxo → Violeta */
-    --gradient-primary: linear-gradient(135deg, hsl(270 80% 60%), hsl(285 85% 65%));
-    --gradient-hero: linear-gradient(135deg, hsl(270 80% 55%), hsl(285 85% 60%), hsl(300 85% 65%));
+    /* Gradientes Nebulosa (Roxo Profundo → Ciano Espacial) */
+    --gradient-primary: linear-gradient(135deg, hsl(270 60% 50%), hsl(190 70% 45%));
+    --gradient-hero: linear-gradient(135deg, hsl(270 60% 45%), hsl(260 55% 50%), hsl(190 70% 45%));
     --gradient-card: linear-gradient(180deg, hsl(0 0% 100% / 0.9), hsl(250 60% 98% / 0.8));
     --gradient-badge-reader: linear-gradient(135deg, hsl(45 100% 60%), hsl(35 100% 55%));
     --gradient-badge-scholar: linear-gradient(135deg, hsl(210 15% 60%), hsl(220 15% 50%));
-    --gradient-badge-master: linear-gradient(135deg, hsl(270 80% 60%), hsl(285 85% 65%));
+    --gradient-badge-master: linear-gradient(135deg, hsl(270 60% 50%), hsl(190 70% 45%));
     
     /* Sombras e Glow */
-    --shadow-glow: 0 0 30px hsl(270 80% 60% / 0.3);
+    --shadow-glow: 0 0 30px hsl(270 60% 50% / 0.3);
     --shadow-card: 0 4px 20px hsl(270 20% 50% / 0.08);
     --shadow-glass: 0 8px 32px hsl(270 30% 40% / 0.1);
     
@@ -94,9 +94,9 @@ All colors MUST be HSL.
     /* Cosmic background (Dark) */
     --cosmos-gradient: linear-gradient(180deg, hsl(258 50% 8%), hsl(265 55% 10%), hsl(270 60% 12%));
 
-    --primary: 270 80% 65%;
+    --primary: 270 60% 55%;
     --primary-foreground: 258 50% 8%;
-    --primary-glow: 280 90% 75%;
+    --primary-glow: 275 65% 65%;
 
     --secondary: 258 40% 18%;
     --secondary-foreground: 250 100% 98%;
@@ -104,7 +104,7 @@ All colors MUST be HSL.
     --muted: 258 30% 20%;
     --muted-foreground: 250 40% 70%;
 
-    --accent: 285 85% 70%;
+    --accent: 190 70% 50%;
     --accent-foreground: 258 50% 8%;
 
     --success: 142 76% 36%;
@@ -117,16 +117,16 @@ All colors MUST be HSL.
     --input: 258 30% 22%;
     --ring: 270 80% 65%;
     
-    /* Gradientes Roxo → Violeta (Dark) */
-    --gradient-primary: linear-gradient(135deg, hsl(270 80% 60%), hsl(285 85% 65%));
-    --gradient-hero: linear-gradient(135deg, hsl(270 80% 50%), hsl(285 85% 55%), hsl(300 85% 60%));
+    /* Gradientes Nebulosa (Dark) */
+    --gradient-primary: linear-gradient(135deg, hsl(270 60% 50%), hsl(190 70% 45%));
+    --gradient-hero: linear-gradient(135deg, hsl(270 60% 40%), hsl(260 55% 45%), hsl(190 70% 45%));
     --gradient-card: linear-gradient(180deg, hsl(258 40% 12% / 0.9), hsl(258 35% 15% / 0.8));
     --gradient-badge-reader: linear-gradient(135deg, hsl(45 100% 55%), hsl(35 100% 50%));
     --gradient-badge-scholar: linear-gradient(135deg, hsl(210 15% 55%), hsl(220 15% 45%));
-    --gradient-badge-master: linear-gradient(135deg, hsl(270 80% 55%), hsl(285 85% 60%));
+    --gradient-badge-master: linear-gradient(135deg, hsl(270 60% 50%), hsl(190 70% 45%));
     
     /* Sombras e Glow (Dark) */
-    --shadow-glow: 0 0 40px hsl(270 80% 60% / 0.4);
+    --shadow-glow: 0 0 40px hsl(270 60% 50% / 0.4);
     --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.3);
     --shadow-glass: 0 8px 32px hsl(0 0% 0% / 0.4);
     
