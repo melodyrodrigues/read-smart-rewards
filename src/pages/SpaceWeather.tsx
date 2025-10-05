@@ -109,14 +109,14 @@ const SpaceWeather = () => {
 
       setTrendingTopics(functionData.topics || []);
       toast({
-        title: "Tópicos atualizados!",
-        description: "IA analisou os dados mais recentes da NASA",
+        title: "Topics updated!",
+        description: "AI analyzed the latest NASA data",
       });
     } catch (error: any) {
       console.error('Error loading trending topics:', error);
       toast({
-        title: "Erro ao carregar tópicos",
-        description: error.message || "Falha ao analisar dados com IA",
+        title: "Error loading topics",
+        description: error.message || "Failed to analyze data with AI",
         variant: "destructive",
       });
     } finally {
@@ -127,8 +127,8 @@ const SpaceWeather = () => {
   const generateColoringImage = async () => {
     if (!coloringPrompt.trim()) {
       toast({
-        title: "Prompt vazio",
-        description: "Por favor, descreva o desenho que deseja criar",
+        title: "Empty prompt",
+        description: "Please describe the drawing you want to create",
         variant: "destructive",
       });
       return;
@@ -147,14 +147,14 @@ const SpaceWeather = () => {
 
       setGeneratedImage(functionData.imageUrl);
       toast({
-        title: "Desenho criado!",
-        description: "Seu desenho para colorir está pronto",
+        title: "Drawing created!",
+        description: "Your coloring drawing is ready",
       });
     } catch (error: any) {
       console.error('Error generating coloring image:', error);
       toast({
-        title: "Erro ao gerar desenho",
-        description: error.message || "Falha ao criar desenho com IA",
+        title: "Error generating drawing",
+        description: error.message || "Failed to create drawing with AI",
         variant: "destructive",
       });
     } finally {
@@ -173,8 +173,8 @@ const SpaceWeather = () => {
     document.body.removeChild(link);
     
     toast({
-      title: "Download iniciado!",
-      description: "Seu desenho está sendo baixado",
+      title: "Download started!",
+      description: "Your drawing is being downloaded",
     });
   };
 
@@ -267,11 +267,11 @@ const SpaceWeather = () => {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="trending">
               <TrendingUp className="w-4 h-4 mr-2" />
-              Em Alta
+              Trending
             </TabsTrigger>
             <TabsTrigger value="coloring">
               <Palette className="w-4 h-4 mr-2" />
-              Desenhos
+              Coloring
             </TabsTrigger>
             <TabsTrigger value="flares">Solar Flares</TabsTrigger>
             <TabsTrigger value="cme">CME</TabsTrigger>
@@ -380,10 +380,10 @@ const SpaceWeather = () => {
                   <div>
                     <CardTitle className="flex items-center gap-2">
                       <TrendingUp className="w-5 h-5 text-primary" />
-                      Tópicos em Alta sobre Clima Espacial
+                      Trending Space Weather Topics
                     </CardTitle>
                     <CardDescription>
-                      Análise por IA dos dados mais recentes da NASA DONKI
+                      AI analysis of the latest NASA DONKI data
                     </CardDescription>
                   </div>
                   <Button
@@ -394,12 +394,12 @@ const SpaceWeather = () => {
                     {loadingTrending ? (
                       <>
                         <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                        Analisando...
+                        Analyzing...
                       </>
                     ) : (
                       <>
                         <Sparkles className="w-4 h-4 mr-2" />
-                        Gerar Tópicos com IA
+                        Generate Topics with AI
                       </>
                     )}
                   </Button>
@@ -413,10 +413,10 @@ const SpaceWeather = () => {
                   <div className="text-center space-y-4">
                     <Sparkles className="w-16 h-16 mx-auto text-primary/50" />
                     <div>
-                      <h3 className="text-lg font-semibold mb-2">Descubra os Tópicos em Alta</h3>
+                      <h3 className="text-lg font-semibold mb-2">Discover Trending Topics</h3>
                       <p className="text-muted-foreground max-w-md mx-auto">
-                        Clique no botão "Gerar Tópicos com IA" para descobrir os assuntos mais relevantes
-                        sobre clima espacial baseados nos dados mais recentes da NASA
+                        Click "Generate Topics with AI" to discover the most relevant subjects
+                        about space weather based on the latest NASA data
                       </p>
                     </div>
                   </div>
@@ -440,7 +440,7 @@ const SpaceWeather = () => {
                             variant="outline" 
                             className="border-primary/30 bg-gradient-primary text-white"
                           >
-                            {topic.relevance}% relevante
+                            {topic.relevance}% relevant
                           </Badge>
                         </div>
                         <CardTitle className="text-lg group-hover:text-primary transition-colors">
@@ -476,25 +476,17 @@ const SpaceWeather = () => {
             {trendingTopics.length > 0 && (
               <Card className="glass-card border-primary/20 mt-6">
                 <CardHeader>
-                  <CardTitle className="text-lg">Recursos Adicionais da NASA</CardTitle>
+                  <CardTitle className="text-lg">Additional Resources</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <Button
                       variant="outline"
                       className="justify-start gap-2"
-                      onClick={() => window.open('https://www.nasa.gov/mission_pages/sunearth/spaceweather/index.html', '_blank')}
+                      onClick={() => window.open('https://www.spaceweather.com/', '_blank')}
                     >
                       <ExternalLink className="w-4 h-4" />
-                      NASA Space Weather
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="justify-start gap-2"
-                      onClick={() => window.open('https://science.nasa.gov/heliophysics/', '_blank')}
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      Heliophysics
+                      SpaceWeather.com
                     </Button>
                     <Button
                       variant="outline"
@@ -507,10 +499,18 @@ const SpaceWeather = () => {
                     <Button
                       variant="outline"
                       className="justify-start gap-2"
-                      onClick={() => window.open('https://sdo.gsfc.nasa.gov/', '_blank')}
+                      onClick={() => window.open('https://science.nasa.gov/heliophysics/', '_blank')}
                     >
                       <ExternalLink className="w-4 h-4" />
-                      Solar Dynamics Observatory
+                      NASA Heliophysics
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="justify-start gap-2"
+                      onClick={() => window.open('https://www.space.com/news/space-weather', '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Space.com News
                     </Button>
                   </div>
                 </CardContent>
@@ -526,10 +526,10 @@ const SpaceWeather = () => {
                   <div>
                     <CardTitle className="flex items-center gap-2">
                       <Palette className="w-5 h-5 text-primary" />
-                      Gerador de Desenhos para Colorir
+                      Coloring Drawings Generator
                     </CardTitle>
                     <CardDescription>
-                      Crie desenhos temáticos sobre espaço para imprimir e colorir usando IA
+                      Create themed space drawings to print and color using AI
                     </CardDescription>
                   </div>
                   
@@ -539,7 +539,7 @@ const SpaceWeather = () => {
                       value={coloringPrompt}
                       onChange={(e) => setColoringPrompt(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && generateColoringImage()}
-                      placeholder="Ex: astronauta no espaço, planeta com anéis, foguete..."
+                      placeholder="E.g. astronaut in space, planet with rings, rocket..."
                       className="flex-1 px-4 py-2 rounded-md bg-background border border-border focus:outline-none focus:ring-2 focus:ring-primary"
                       disabled={generatingImage}
                     />
@@ -551,12 +551,12 @@ const SpaceWeather = () => {
                       {generatingImage ? (
                         <>
                           <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                          Gerando...
+                          Generating...
                         </>
                       ) : (
                         <>
                           <Sparkles className="w-4 h-4 mr-2" />
-                          Gerar Desenho
+                          Generate Drawing
                         </>
                       )}
                     </Button>
@@ -571,43 +571,43 @@ const SpaceWeather = () => {
                   <div className="text-center space-y-4">
                     <Palette className="w-20 h-20 mx-auto text-primary/50" />
                     <div className="max-w-md mx-auto">
-                      <h3 className="text-xl font-semibold mb-2">Crie Desenhos Personalizados</h3>
+                      <h3 className="text-xl font-semibold mb-2">Create Custom Drawings</h3>
                       <p className="text-muted-foreground">
-                        Digite uma descrição e nossa IA criará um desenho para colorir com tema espacial.
-                        Perfeito para atividades educativas!
+                        Type a description and our AI will create a coloring drawing with a space theme.
+                        Perfect for educational activities!
                       </p>
                       <div className="mt-6 grid grid-cols-2 gap-2 text-sm">
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setColoringPrompt("astronauta flutuando no espaço")}
+                          onClick={() => setColoringPrompt("astronaut floating in space")}
                           className="text-xs"
                         >
-                          🚀 Astronauta
+                          🚀 Astronaut
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setColoringPrompt("sistema solar com todos os planetas")}
+                          onClick={() => setColoringPrompt("solar system with all planets")}
                           className="text-xs"
                         >
-                          🪐 Sistema Solar
+                          🪐 Solar System
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setColoringPrompt("foguete decolando da Terra")}
+                          onClick={() => setColoringPrompt("rocket launching from Earth")}
                           className="text-xs"
                         >
-                          🚀 Foguete
+                          🚀 Rocket
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setColoringPrompt("galáxia espiral com estrelas")}
+                          onClick={() => setColoringPrompt("spiral galaxy with stars")}
                           className="text-xs"
                         >
-                          ⭐ Galáxia
+                          ⭐ Galaxy
                         </Button>
                       </div>
                     </div>
@@ -618,7 +618,7 @@ const SpaceWeather = () => {
               <Card className="glass-card border-primary/20">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>Seu Desenho</CardTitle>
+                    <CardTitle>Your Drawing</CardTitle>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
@@ -627,7 +627,7 @@ const SpaceWeather = () => {
                         className="gap-2"
                       >
                         <Download className="w-4 h-4" />
-                        Baixar
+                        Download
                       </Button>
                       <Button
                         variant="outline"
@@ -637,7 +637,7 @@ const SpaceWeather = () => {
                           setColoringPrompt("");
                         }}
                       >
-                        Novo Desenho
+                        New Drawing
                       </Button>
                     </div>
                   </div>
@@ -646,14 +646,14 @@ const SpaceWeather = () => {
                   <div className="relative rounded-lg overflow-hidden bg-white p-4">
                     <img
                       src={generatedImage}
-                      alt="Desenho para colorir"
+                      alt="Coloring drawing"
                       className="w-full h-auto rounded-md shadow-lg"
                     />
                   </div>
                   <div className="mt-4 p-4 bg-background/50 rounded-lg">
                     <p className="text-sm text-muted-foreground">
-                      <strong>Dica:</strong> Baixe o desenho e imprima para colorir com lápis de cor, 
-                      canetinhas ou tinta. Você também pode colorir digitalmente usando programas de edição de imagem.
+                      <strong>Tip:</strong> Download the drawing and print it to color with colored pencils, 
+                      markers or paint. You can also color it digitally using image editing programs.
                     </p>
                   </div>
                 </CardContent>

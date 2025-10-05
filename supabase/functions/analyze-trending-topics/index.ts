@@ -32,24 +32,28 @@ Geomagnetic Storms: ${spaceWeatherData.geomagneticStorms?.count || 0} events
 Total Notifications: ${spaceWeatherData.notifications?.count || 0}
 `;
 
-    const systemPrompt = `You are an expert space weather analyst. Based on real NASA data, identify 5 trending topics in space weather that would be most interesting and relevant to the general public. For each topic:
-1. Give it an engaging title (in Portuguese)
-2. Provide a brief, fascinating description (2-3 sentences in Portuguese)
+    const systemPrompt = `You are an expert space weather analyst. Based on real NASA data and current space weather conditions, identify 5 REAL trending topics that are currently being discussed in the space weather community. 
+
+For each topic:
+1. Give it an engaging title (in English)
+2. Provide a brief, fascinating description (2-3 sentences in English) based on CURRENT events
 3. Assign a category: "solar", "magnetosphere", "radiation", "aurora", or "cosmic"
-4. Give it a relevance score (1-100) based on current activity
-5. Provide a REAL, working URL to learn more about the topic. Use actual websites like:
-   - https://www.spaceweather.com/
-   - https://www.swpc.noaa.gov/
-   - https://science.nasa.gov/heliophysics/
-   - https://sdo.gsfc.nasa.gov/
-   - https://www.nasa.gov/solar-system/
-   - https://www.esa.int/Science_Exploration/Space_Science/
-   - https://www.nationalgeographic.com/ (for general space topics)
-   - https://www.space.com/ (for space news)
+4. Give it a relevance score (1-100) based on current activity levels in the data
+5. Provide a REAL, working URL from these trusted sources:
+   - https://www.spaceweather.com/ - for current space weather news
+   - https://www.swpc.noaa.gov/ - for official forecasts and alerts
+   - https://science.nasa.gov/heliophysics/ - for solar science
+   - https://sdo.gsfc.nasa.gov/ - for solar observations
+   - https://www.space.com/news/space-weather - for space weather news
+   - https://www.esa.int/Science_Exploration/Space_Science/ - for ESA space science
 
-IMPORTANT: The URLs must be REAL and currently accessible. Match the URL to the specific topic (e.g., aurora topics should link to aurora-related pages).
+CRITICAL: Match URLs to topics accurately:
+- Solar flare topics → spaceweather.com or swpc.noaa.gov
+- Aurora topics → spaceweather.com or specific aurora pages
+- CME topics → swpc.noaa.gov or sdo.gsfc.nasa.gov
+- General space weather → science.nasa.gov or space.com
 
-Focus on making the topics educational, engaging, and connected to current space weather conditions.`;
+Base your topics on the actual data provided - if there are many solar flares, make that a trending topic. If CME activity is high, highlight that.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -75,9 +79,9 @@ Focus on making the topics educational, engaging, and connected to current space
                   type: "array",
                   items: {
                     type: "object",
-                    properties: {
-                      title: { type: "string", description: "Engaging title in Portuguese" },
-                      description: { type: "string", description: "Brief description in Portuguese" },
+                  properties: {
+                    title: { type: "string", description: "Engaging title in English" },
+                    description: { type: "string", description: "Brief description in English" },
                       category: { 
                         type: "string", 
                         enum: ["solar", "magnetosphere", "radiation", "aurora", "cosmic"],
@@ -91,7 +95,7 @@ Focus on making the topics educational, engaging, and connected to current space
                       },
                       nasaUrl: { 
                         type: "string", 
-                        description: "Relevant NASA resource URL"
+                        description: "Real, working URL to a relevant page about this topic. Must be from spaceweather.com, swpc.noaa.gov, nasa.gov, esa.int, or space.com"
                       }
                     },
                     required: ["title", "description", "category", "relevance", "nasaUrl"],
