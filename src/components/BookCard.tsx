@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen, Trash2 } from "lucide-react";
+import { BookOpen, Trash2, Download, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface BookCardProps {
   book: {
@@ -20,9 +21,49 @@ interface BookCardProps {
 }
 
 const BookCard = ({ book, progress, onDelete, onClick }: BookCardProps) => {
+  const { toast } = useToast();
   const progressPercent = progress && book.total_pages > 0
     ? (progress.pages_read / book.total_pages) * 100
     : 0;
+
+  const handleDownload = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const link = document.createElement("a");
+    link.href = book.cover_url || "#";
+    link.download = `${book.title}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Download started",
+      description: `Downloading ${book.title}`,
+    });
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: book.title,
+          text: `Check out this book: ${book.title}${book.author ? ` by ${book.author}` : ''}`,
+          url: window.location.href,
+        });
+      } catch (error) {
+        if ((error as Error).name !== 'AbortError') {
+          console.error('Error sharing:', error);
+        }
+      }
+    } else {
+      navigator.clipboard.writeText(`${book.title}${book.author ? ` by ${book.author}` : ''} - ${window.location.href}`);
+      toast({
+        title: "Link copied!",
+        description: "Book details copied to clipboard",
+      });
+    }
+  };
 
   return (
     <Card 
@@ -55,19 +96,37 @@ const BookCard = ({ book, progress, onDelete, onClick }: BookCardProps) => {
             </svg>
           </div>
         )}
-        {onDelete && (
+        <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button
-            variant="destructive"
+            variant="secondary"
             size="icon"
-            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(book.id);
-            }}
+            className="h-8 w-8"
+            onClick={handleDownload}
           >
-            <Trash2 className="w-4 h-4" />
+            <Download className="w-4 h-4" />
           </Button>
-        )}
+          <Button
+            variant="secondary"
+            size="icon"
+            className="h-8 w-8"
+            onClick={handleShare}
+          >
+            <Share2 className="w-4 h-4" />
+          </Button>
+          {onDelete && (
+            <Button
+              variant="destructive"
+              size="icon"
+              className="h-8 w-8"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(book.id);
+              }}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
       </div>
       
       <div className="p-4">

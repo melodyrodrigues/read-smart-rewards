@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Trophy, MessageSquare, LogOut, Sparkles } from "lucide-react";
+import { BookOpen, Trophy, MessageSquare, LogOut, Sparkles, Image } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import BookCard from "@/components/BookCard";
 import ChatAssistant from "@/components/ChatAssistant";
@@ -11,6 +11,7 @@ import AchievementBadge from "@/components/AchievementBadge";
 import UploadBook from "@/components/UploadBook";
 import KeywordsPanel from "@/components/KeywordsPanel";
 import Leaderboard from "@/components/Leaderboard";
+import ImageGenerator from "@/components/ImageGenerator";
 import heroImage from "@/assets/hero-reading.jpg";
 
 const Index = () => {
@@ -136,7 +137,7 @@ const Index = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="library" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="library" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
               Library
@@ -144,6 +145,10 @@ const Index = () => {
             <TabsTrigger value="keywords" className="flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
               Keywords
+            </TabsTrigger>
+            <TabsTrigger value="image-gen" className="flex items-center gap-2">
+              <Image className="w-4 h-4" />
+              AI Images
             </TabsTrigger>
             <TabsTrigger value="assistant" className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
@@ -183,6 +188,10 @@ const Index = () => {
 
           <TabsContent value="keywords">
             <KeywordsPanel books={books} />
+          </TabsContent>
+
+          <TabsContent value="image-gen">
+            <ImageGenerator />
           </TabsContent>
 
           <TabsContent value="assistant">
