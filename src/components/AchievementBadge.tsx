@@ -5,9 +5,12 @@ import badgeMaster from "@/assets/badge-master.png";
 import badgeHubble from "@/assets/badge-hubble.png";
 import badgeChandra from "@/assets/badge-chandra.png";
 import badgeJWST from "@/assets/badge-jwst.png";
+import badgeKeywordBronze from "@/assets/badge-keyword-bronze.png";
+import badgeKeywordSilver from "@/assets/badge-keyword-silver.png";
+import badgeKeywordGold from "@/assets/badge-keyword-gold.png";
 
 interface AchievementBadgeProps {
-  type: "reader" | "scholar" | "master" | "hubble" | "chandra" | "jwst";
+  type: "reader" | "scholar" | "master" | "hubble" | "chandra" | "jwst" | "keyword-bronze" | "keyword-silver" | "keyword-gold";
   earned?: boolean;
   description: string;
 }
@@ -48,6 +51,24 @@ const BADGE_MAP = {
     title: "JAMES WEBB PIONEER", 
     gradient: "bg-gradient-to-br from-yellow-500 via-amber-600 to-orange-500",
     glow: "shadow-[0_0_40px_hsl(35_95%_55%/0.7)]"
+  },
+  "keyword-bronze": { 
+    img: badgeKeywordBronze, 
+    title: "KEYWORD EXPLORER", 
+    gradient: "bg-gradient-to-br from-orange-600 via-amber-700 to-orange-800",
+    glow: "shadow-[0_0_30px_hsl(25_75%_45%/0.5)]"
+  },
+  "keyword-silver": { 
+    img: badgeKeywordSilver, 
+    title: "KEYWORD SPECIALIST", 
+    gradient: "bg-gradient-to-br from-slate-300 via-gray-400 to-slate-500",
+    glow: "shadow-[0_0_35px_hsl(210_10%_45%/0.6)]"
+  },
+  "keyword-gold": { 
+    img: badgeKeywordGold, 
+    title: "KEYWORD MASTER", 
+    gradient: "bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600",
+    glow: "shadow-[0_0_40px_hsl(45_100%_50%/0.7)]"
   },
 };
 

@@ -136,19 +136,6 @@ export const GlossaryPopover = ({ term, children, definition, category, example 
   const updateKeywordClick = async (keyword: string) => {
     const lowerKeyword = keyword.toLowerCase();
     
-    // Determine which telescope category this keyword belongs to
-    let telescopeType: 'hubble_clicks' | 'chandra_clicks' | 'jwst_clicks' | null = null;
-    
-    if (lowerKeyword.includes('hubble')) {
-      telescopeType = 'hubble_clicks';
-    } else if (lowerKeyword.includes('chandra')) {
-      telescopeType = 'chandra_clicks';
-    } else if (lowerKeyword.includes('webb') || lowerKeyword.includes('jwst') || lowerKeyword.includes('james webb')) {
-      telescopeType = 'jwst_clicks';
-    }
-    
-    if (!telescopeType) return;
-    
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -160,24 +147,46 @@ export const GlossaryPopover = ({ term, children, definition, category, example 
         .eq('user_id', user.id)
         .single();
       
+      // Determine which telescope category this keyword belongs to
+      let telescopeType: 'hubble_clicks' | 'chandra_clicks' | 'jwst_clicks' | null = null;
+      
+      if (lowerKeyword.includes('hubble')) {
+        telescopeType = 'hubble_clicks';
+      } else if (lowerKeyword.includes('chandra')) {
+        telescopeType = 'chandra_clicks';
+      } else if (lowerKeyword.includes('webb') || lowerKeyword.includes('jwst') || lowerKeyword.includes('james webb')) {
+        telescopeType = 'jwst_clicks';
+      }
+      
       if (existingStats) {
-        // Update existing stats
+        // Update existing stats - always increment keyword_clicks
+        const updateData: any = {
+          keyword_clicks: (existingStats.keyword_clicks || 0) + 1
+        };
+        
+        // Also increment telescope-specific counter if applicable
+        if (telescopeType) {
+          updateData[telescopeType] = (existingStats[telescopeType] || 0) + 1;
+        }
+        
         await supabase
           .from('user_stats')
-          .update({
-            [telescopeType]: (existingStats[telescopeType] || 0) + 1,
-            keyword_clicks: (existingStats.keyword_clicks || 0) + 1
-          })
+          .update(updateData)
           .eq('user_id', user.id);
       } else {
         // Create new stats record
+        const insertData: any = {
+          user_id: user.id,
+          keyword_clicks: 1
+        };
+        
+        if (telescopeType) {
+          insertData[telescopeType] = 1;
+        }
+        
         await supabase
           .from('user_stats')
-          .insert({
-            user_id: user.id,
-            [telescopeType]: 1,
-            keyword_clicks: 1
-          });
+          .insert(insertData);
       }
     } catch (error) {
       console.error('Error updating keyword click stats:', error);

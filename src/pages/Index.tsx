@@ -228,19 +228,19 @@ const Index = () => {
                 <h3 className="text-xl font-semibold mb-4 text-center">Keywords Explorer Badges</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <AchievementBadge
-                    type="hubble"
-                    earned={(userStats?.hubble_clicks || 0) >= 5}
-                    description="Click 5 Hubble-related keywords"
+                    type="keyword-bronze"
+                    earned={(userStats?.keyword_clicks || 0) >= 10}
+                    description="Click 10 keywords"
                   />
                   <AchievementBadge
-                    type="chandra"
-                    earned={(userStats?.chandra_clicks || 0) >= 5}
-                    description="Click 5 Chandra-related keywords"
+                    type="keyword-silver"
+                    earned={(userStats?.keyword_clicks || 0) >= 25}
+                    description="Click 25 keywords"
                   />
                   <AchievementBadge
-                    type="jwst"
-                    earned={(userStats?.jwst_clicks || 0) >= 5}
-                    description="Click 5 James Webb-related keywords"
+                    type="keyword-gold"
+                    earned={(userStats?.keyword_clicks || 0) >= 50}
+                    description="Click 50 keywords"
                   />
                 </div>
               </div>
