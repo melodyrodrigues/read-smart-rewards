@@ -202,6 +202,12 @@ const Index = () => {
                 </p>
               </div>
 
+              {/* Global Leaderboard */}
+              <div>
+                <h3 className="text-xl font-semibold mb-4 text-center">Global Rankings</h3>
+                <Leaderboard />
+              </div>
+
               {/* Library Mission Badges */}
               <div>
                 <h3 className="text-xl font-semibold mb-4 text-center">Library Mission Badges</h3>
@@ -244,12 +250,6 @@ const Index = () => {
                     description="Click 50 keywords"
                   />
                 </div>
-              </div>
-
-              {/* Global Leaderboard */}
-              <div>
-                <h3 className="text-xl font-semibold mb-4 text-center">Global Rankings</h3>
-                <Leaderboard />
               </div>
             </div>
           </TabsContent>
