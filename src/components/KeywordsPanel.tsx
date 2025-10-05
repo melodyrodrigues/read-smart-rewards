@@ -2,68 +2,77 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GlossaryPopover } from "@/components/GlossaryPopover";
-import { Sparkles, BookOpen } from "lucide-react";
+import { Sparkles, BookOpen, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface KeywordsPanelProps {
   books: any[];
 }
 
-// Common words to exclude (stopwords in Portuguese and English)
-const stopWords = new Set([
-  "a", "o", "e", "de", "da", "do", "em", "para", "com", "por", "uma", "um",
-  "os", "as", "dos", "das", "ao", "aos", "à", "às", "no", "na", "nos", "nas",
-  "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "of",
-  "with", "by", "from", "is", "are", "was", "were", "be", "been", "being",
-  "have", "has", "had", "do", "does", "did", "will", "would", "could", "should",
-  "que", "não", "se", "mais", "como", "muito", "sua", "seu", "seus", "suas",
-  "esse", "essa", "isso", "isto", "este", "esta", "aquele", "aquela", "deste",
-  "desta", "neste", "nesta", "pelo", "pela", "pelos", "pelas", "também", "já",
-]);
+interface KeywordWithInfo {
+  keyword: string;
+  hasNasaInfo: boolean;
+  nasaData: any;
+}
 
 export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
-  const [extractedKeywords, setExtractedKeywords] = useState<string[]>([]);
+  const [extractedKeywords, setExtractedKeywords] = useState<KeywordWithInfo[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    extractKeywords();
+    if (books.length > 0) {
+      analyzeBooks();
+    }
   }, [books]);
 
-  const extractKeywords = () => {
-    const keywordFrequency = new Map<string, number>();
-    
-    books.forEach(book => {
-      // Combine title, author, and content for analysis
-      const textToAnalyze = [
-        book.title,
-        book.author || '',
-        book.content || ''
-      ].join(' ');
+  const analyzeBooks = async () => {
+    setLoading(true);
+    try {
+      // Analyze all books
+      const allKeywords: KeywordWithInfo[] = [];
+      
+      for (const book of books) {
+        const { data, error } = await supabase.functions.invoke('analyze-book-keywords', {
+          body: {
+            bookTitle: book.title,
+            bookAuthor: book.author,
+            bookContent: book.content
+          }
+        });
 
-      // Extract words
-      const words = textToAnalyze
-        .toLowerCase()
-        .replace(/[^\w\sáàâãéèêíïóôõöúçñ]/g, ' ') // Keep accented characters
-        .split(/\s+/)
-        .filter(word => 
-          word.length > 3 && // Minimum length
-          !stopWords.has(word) && // Not a stopword
-          !/^\d+$/.test(word) // Not just numbers
-        );
+        if (error) {
+          console.error('Error analyzing book:', error);
+          continue;
+        }
 
-      // Count frequency
-      words.forEach(word => {
-        const count = keywordFrequency.get(word) || 0;
-        keywordFrequency.set(word, count + 1);
+        if (data?.success && data?.keywords) {
+          allKeywords.push(...data.keywords);
+        }
+      }
+
+      // Remove duplicates and sort
+      const uniqueKeywords = Array.from(
+        new Map(allKeywords.map(k => [k.keyword.toLowerCase(), k])).values()
+      ).sort((a, b) => a.keyword.localeCompare(b.keyword));
+
+      setExtractedKeywords(uniqueKeywords);
+      
+      toast({
+        title: "Keywords analyzed!",
+        description: `Found ${uniqueKeywords.length} keywords using AI.`,
       });
-    });
-
-    // Sort by frequency and take top keywords
-    const sortedKeywords = Array.from(keywordFrequency.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 50) // Top 50 keywords
-      .map(([word]) => word)
-      .sort(); // Alphabetically for display
-
-    setExtractedKeywords(sortedKeywords);
+    } catch (error) {
+      console.error('Error analyzing books:', error);
+      toast({
+        title: "Error analyzing keywords",
+        description: "Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (books.length === 0) {
@@ -84,28 +93,44 @@ export const KeywordsPanel = ({ books }: KeywordsPanelProps) => {
         <div className="flex items-center gap-3 mb-4">
           <Sparkles className="w-6 h-6 text-primary" />
           <h2 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Book Keywords
+            AI-Extracted Keywords
           </h2>
+          {loading && <Loader2 className="w-5 h-5 animate-spin text-primary" />}
         </div>
         <p className="text-muted-foreground">
-          Most frequent keywords extracted from your books. Click on any keyword to see if there's a glossary definition available.
+          Keywords intelligently extracted from your books using AI. Each keyword is enriched with NASA space weather information when available.
         </p>
       </Card>
 
       {/* Keywords Grid */}
-      {extractedKeywords.length > 0 ? (
+      {loading ? (
+        <Card className="p-12">
+          <div className="flex flex-col items-center justify-center gap-4">
+            <Loader2 className="w-12 h-12 animate-spin text-primary" />
+            <p className="text-muted-foreground">Analyzing books with AI...</p>
+          </div>
+        </Card>
+      ) : extractedKeywords.length > 0 ? (
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">
-            Detected Keywords ({extractedKeywords.length})
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            AI-Detected Keywords ({extractedKeywords.length})
+            <Badge variant="outline" className="ml-2">
+              {extractedKeywords.filter(k => k.hasNasaInfo).length} with NASA data
+            </Badge>
           </h3>
           <div className="flex flex-wrap gap-3">
-            {extractedKeywords.map((keyword) => (
-              <GlossaryPopover key={keyword} term={keyword}>
+            {extractedKeywords.map((kwInfo, idx) => (
+              <GlossaryPopover key={`${kwInfo.keyword}-${idx}`} term={kwInfo.keyword}>
                 <Badge 
                   variant="secondary" 
-                  className="cursor-pointer hover:bg-primary/20 transition-colors text-base py-2 px-4 border border-primary/30"
+                  className={`cursor-pointer hover:bg-primary/20 transition-colors text-base py-2 px-4 border ${
+                    kwInfo.hasNasaInfo ? 'border-primary/50 bg-primary/10' : 'border-primary/30'
+                  }`}
                 >
-                  {keyword}
+                  {kwInfo.keyword}
+                  {kwInfo.hasNasaInfo && (
+                    <Sparkles className="w-3 h-3 ml-1 inline text-primary" />
+                  )}
                 </Badge>
               </GlossaryPopover>
             ))}
