@@ -85,7 +85,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen cosmic-bg">
       {/* Hero Section */}
       <div className="relative h-[400px] overflow-hidden">
         <img 
@@ -96,14 +96,14 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />
         <div className="absolute inset-0 flex flex-col items-start justify-center px-8 md:px-16 max-w-2xl">
           <div className="flex items-center gap-3 mb-4 animate-fade-in">
-            <BookOpen className="w-12 h-12 text-primary" />
-            <Sparkles className="w-8 h-8 text-accent animate-glow-pulse" />
+            <BookOpen className="w-12 h-12 text-primary drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
+            <Sparkles className="w-8 h-8 text-accent animate-glow-pulse drop-shadow-[0_0_10px_rgba(192,132,252,0.6)]" />
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent animate-fade-in">
-            ReadQuest
+          <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent animate-fade-in drop-shadow-[0_0_20px_rgba(168,85,247,0.3)]">
+            Cosmo Reader
           </h1>
           <p className="text-xl text-foreground/80 mb-6 animate-fade-in">
-            Transforme sua leitura em uma jornada épica de conhecimento
+            Navegue pelo universo do conhecimento com dados espaciais em tempo real
           </p>
           <Button 
             onClick={handleSignOut}
@@ -168,8 +168,8 @@ const Index = () => {
 
           <TabsContent value="achievements">
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-primary bg-clip-text text-transparent">
-                Suas Conquistas
+              <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-primary bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+                🌟 Conquistas Estelares
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <AchievementBadge

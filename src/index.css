@@ -16,6 +16,9 @@ All colors MUST be HSL.
 
     --popover: 0 0% 100%;
     --popover-foreground: 258 90% 10%;
+    
+    /* Cosmic background */
+    --cosmos-gradient: linear-gradient(180deg, hsl(250 100% 98%), hsl(260 80% 96%), hsl(270 70% 94%));
 
     --primary: 270 80% 60%;
     --primary-foreground: 0 0% 100%;
@@ -87,6 +90,9 @@ All colors MUST be HSL.
 
     --popover: 258 40% 12%;
     --popover-foreground: 250 100% 98%;
+    
+    /* Cosmic background (Dark) */
+    --cosmos-gradient: linear-gradient(180deg, hsl(258 50% 8%), hsl(265 55% 10%), hsl(270 60% 12%));
 
     --primary: 270 80% 65%;
     --primary-foreground: 258 50% 8%;
@@ -171,5 +177,38 @@ All colors MUST be HSL.
   .glass-card-hover:hover {
     box-shadow: var(--shadow-glow);
     transform: translateY(-2px);
+  }
+  
+  .cosmic-bg {
+    background: var(--cosmos-gradient);
+    position: relative;
+  }
+  
+  .cosmic-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.8), transparent),
+      radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 255, 0.6), transparent),
+      radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.4), transparent),
+      radial-gradient(1px 1px at 80% 10%, rgba(255, 255, 255, 0.5), transparent),
+      radial-gradient(2px 2px at 90% 60%, rgba(255, 255, 255, 0.7), transparent),
+      radial-gradient(1px 1px at 33% 85%, rgba(255, 255, 255, 0.5), transparent),
+      radial-gradient(1px 1px at 15% 95%, rgba(255, 255, 255, 0.6), transparent);
+    background-size: 200% 200%;
+    animation: twinkle 8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  
+  @keyframes twinkle {
+    0%, 100% {
+      opacity: 1;
+      background-position: 0% 0%;
+    }
+    50% {
+      opacity: 0.5;
+      background-position: 100% 100%;
+    }
   }
 }
