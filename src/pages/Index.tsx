@@ -105,14 +105,23 @@ const Index = () => {
           <p className="text-xl text-foreground/80 mb-6 animate-fade-in">
             Navigate the universe of knowledge with real-time space data
           </p>
-          <Button 
-            onClick={handleSignOut}
-            variant="outline"
-            className="animate-scale-in"
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign Out
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => navigate("/space-weather")}
+              className="bg-gradient-primary hover:opacity-90 animate-scale-in"
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              Space Weather Glossary
+            </Button>
+            <Button 
+              onClick={handleSignOut}
+              variant="outline"
+              className="animate-scale-in glass-card"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign Out
+            </Button>
+          </div>
         </div>
       </div>
 
