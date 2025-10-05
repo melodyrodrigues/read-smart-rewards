@@ -223,9 +223,9 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Telescope Explorer Badges */}
+              {/* Keywords Explorer Badges */}
               <div>
-                <h3 className="text-xl font-semibold mb-4 text-center">Telescope Explorer Badges</h3>
+                <h3 className="text-xl font-semibold mb-4 text-center">Keywords Explorer Badges</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <AchievementBadge
                     type="hubble"
